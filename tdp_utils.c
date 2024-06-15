@@ -5,8 +5,52 @@
 #define min(a, b) ((a) < (b) ? (a) : (b))
 #define max(a, b) ((a) > (b) ? (a) : (b))
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include <math.h>
 
+void landscape_update(int lattice[][SIZE], float p, float q);
+void get_random_neighbour(int focal_i, int focal_j, int *neigh_i, int *neigh_j);
+void get_pair_neighbour(int focal_i, int focal_j, int neigh_i, int neigh_j, int *pair_i, int *pair_j);
+float get_density(int lattice[][SIZE]);
+
+void landscape_update(int lattice[][SIZE], float p, float q) {
+    int focal_i, focal_j;
+    int neigh_i, neigh_j;
+    int pair_i, pair_j;
+    float random_number;
+
+    for (int i = 0; i < SIZE * SIZE; i++) {
+        focal_i = rand() % SIZE;
+        focal_j = rand() % SIZE;
+
+        if (lattice[focal_i][focal_j] == 1) {
+            get_random_neighbour(focal_i, focal_j, &neigh_i, &neigh_j);
+
+            if (lattice[neigh_i][neigh_j] == 0) {
+                random_number = (float) rand() / RAND_MAX;
+
+                if (random_number < p) {
+                    lattice[neigh_i][neigh_j] = 1;
+                }
+                else {
+                    lattice[focal_i][focal_j] = 0;
+                }
+            }
+            else {
+                random_number = (float) rand() / RAND_MAX;
+                if (random_number < q) {
+                    get_pair_neighbour(focal_i, focal_j, neigh_i, neigh_j, &pair_i, &pair_j);
+                    lattice[pair_i][pair_j] = 1;
+                }
+                else if (((float) rand() / RAND_MAX) < 1 - p) {
+                    lattice[focal_i][focal_j] = 0;
+                }
+            }
+        }
+    }
+}
 
 void get_random_neighbour(int focal_i, int focal_j, int *neigh_i, int *neigh_j) {
     int random_direction = rand() % 4;
