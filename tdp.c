@@ -1,4 +1,4 @@
-#define SIZE 100
+#define SIZE 256
 #define EQUILIBRATION 1000
 #define SIMULATION 1000
 
@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 #include "tdp_utils.c"
 #include "cluster_dynamics.c"
 #include "objects/dynamics_list.c"
@@ -78,14 +79,8 @@ int single_update(int lattice[][SIZE], float p, float q, int *changed_x, int *ch
 int main(int argc, char *argv[]) {
     float p = atof(argv[1]);
     float q = atof(argv[2]);
-    int simulation_index;
-
-    if (argc == 4) {
-        simulation_index = atoi(argv[3]);
-    }
-    else {
-        simulation_index = 0;
-    }
+    int simulation_index = atoi(argv[3]);
+    char *file_root = argv[4];
 
     srand(getpid()); 
     int lattice[SIZE][SIZE];
@@ -107,20 +102,46 @@ int main(int argc, char *argv[]) {
         landscape_update(lattice, p, q);
     }
 
-    int changed_x, changed_y;
-    int before[4], after[4];
-    for (int i = 0; i < SIMULATION; i++) {
-        if (simulation_index == 0) {
-            printf("\33[2K\r");
-            printf("Simulation: %f", (float) i * 100 / SIMULATION);
-        }
-        for (int j = 0; j < SIZE * SIZE; j++) {
-            if (single_update(lattice, p, q, &changed_x, &changed_y)) {
-                cluster_dynamics(lattice, changed_x, changed_y, before, after);
-                dynamics_list = prepend_dynamics(dynamics_list, before, after);
+    if (SIMULATION) {
+        int changed_x, changed_y;
+        int before[4], after[4];
+        for (int i = 0; i < SIMULATION; i++) {
+            if (simulation_index == 0) {
+                printf("\33[2K\r");
+                printf("Simulation: %f", (float) i * 100 / SIMULATION);
+            }
+            for (int j = 0; j < SIZE * SIZE; j++) {
+                if (single_update(lattice, p, q, &changed_x, &changed_y)) {
+                    cluster_dynamics(lattice, changed_x, changed_y, before, after);
+                    dynamics_list = prepend_dynamics(dynamics_list, before, after);
+                }
             }
         }
     }
+    
+    char file_name[20];
+    strcat(file_name, file_root);
+    strcat(file_name, "dynamics.txt");
 
-    print_dynamics_list(dynamics_list);
+    FILE *file = fopen(file_name, "w");
+
+    if (file == NULL) {
+        printf("Error opening file!\n");
+        exit(1);
+    }
+
+    dynamics_node *current = dynamics_list;
+    while (current != NULL) {
+        for (int i = 0; i < 4; i++) {
+            fprintf(file, "%d ", current->before[i]);
+        }
+        fprintf(file, ": ");
+        for (int i = 0; i < 4; i++) {
+            fprintf(file, "%d ", current->after[i]);
+        }
+        fprintf(file, "\n");
+        current = current->next;
+    }
+
+    fclose(file);
 }

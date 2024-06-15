@@ -7,18 +7,19 @@ def process(simulation_name, simulation_index, parameters):
     if simulation_name == "tdp":
         p = parameters[0]
         q = parameters[1]
+        file_root = f"temp/tdp_{str(p).replace('.', 'p')}_{str(q).replace('.', 'q')}_{simulation_index}_"
 
         if name == "nt":
-            run(f"tdp.exe {p} {q} {simulation_index}", shell=True)
+            run(f'tdp.exe {p} {q} {simulation_index} "{file_root}"', shell=True)
         else:
-            run(f"./tdp {p} {q} {simulation_index}", shell=True)
+            run(f'./tdp {p} {q} {simulation_index} "{file_root}"', shell=True)
 
 
 if __name__ == '__main__':
     set_start_method('spawn')
     simulation_name = "tdp"
-    parameters = [0.29, 0.92]
-    num_simulations = 4
+    parameters = [0.7, 0]
+    num_simulations = 24
 
     if simulation_name == "tdp":
         system(f"gcc tdp.c -o tdp")  
