@@ -1,10 +1,11 @@
 #define SIZE 256
-#define UPDATES 1000
+#define UPDATES 10000
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <unistd.h>
 
 #include "tdp_helpers.c"
 
@@ -55,7 +56,7 @@ int main(int argc, char *argv[]) {
     float q = atof(argv[2]);
     int simulation_index = atoi(argv[3]);
 
-    srand(time(NULL)); 
+    srand(getpid()); 
     int lattice[SIZE][SIZE];
 
     int random_value;
