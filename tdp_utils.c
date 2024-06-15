@@ -172,13 +172,3 @@ void get_pair_neighbour(int focal_i, int focal_j, int neigh_i, int neigh_j, int 
     *pair_i = i;
     *pair_j = j;
 }
-
-float get_density(int lattice[][SIZE]) {
-    int count = 0;
-    for (int i = 0; i < SIZE; i++) {
-        for (int j = 0; j < SIZE; j++) {
-            count += lattice[i][j];
-        }
-    }
-    return (float) count / (SIZE * SIZE);
-}
