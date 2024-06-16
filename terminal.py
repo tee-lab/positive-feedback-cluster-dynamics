@@ -15,7 +15,6 @@ def process(simulation_name, simulation_index, parameters):
         if name == "nt":
             run(f'tdp.exe {p} {q} {simulation_index} "{file_root}"', shell=True)
         else:
-            file_root += f"tdp_{str(p).replace('.', 'p')}_{str(q).replace('.', 'q')}_{simulation_index}_"
             run(f'./tdp {p} {q} {simulation_index} "{file_root}"', shell=True)
 
 

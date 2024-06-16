@@ -16,11 +16,11 @@ def cluster_size_distribution(landscapes, file_root):
     for i in range(len(clusters_histogram)):
         output_string += f"{i + 1} {clusters_histogram[i]}\n"
 
-    fp = open("outputs\\" + file_root + "csd.txt", "w")
+    fp = open("outputs/" + file_root + "csd.txt", "w")
     fp.write(output_string)
     fp.close()
 
-    fp = open("outputs\\" + file_root + "lattices.pkl", "wb")
+    fp = open("outputs/" + file_root + "lattices.pkl", "wb")
     dump(landscapes, fp)
     fp.close()
 
@@ -53,7 +53,7 @@ def cluster_dynamics(clusters_before, clusters_after, size, file_root):
     for key in changes_histogram.keys():
         output_string += f"{key} {changes_histogram[key]}\n"
 
-    fp = open("outputs\\" + file_root + "cd.txt", "w")
+    fp = open("outputs/" + file_root + "cd.txt", "w")
     fp.write(output_string)
     fp.close()
 
@@ -105,7 +105,7 @@ def cluster_sde(clusters_before, clusters_after, file_root):
     for i, cluster_size in enumerate(cluster_sizes):
         output_string += f"{cluster_size} {drifts[i]} {diffusions[i]} {num_samples[i]}\n"
     
-    fp = open("outputs\\" + file_root + "sde.txt", "w")
+    fp = open("outputs/" + file_root + "sde.txt", "w")
     fp.write(output_string)
     fp.close()
 
@@ -121,11 +121,11 @@ def analysis(simulation_name, num_simulations, parameters):
         file_root = f"tdp_{str(p).replace('.', 'p')}_{str(q).replace('.', 'q')}_"
 
     for i in range(num_simulations):
-        file_name = f"temp\\{file_root}{i}_landscape.txt"
+        file_name = f"temp/{file_root}{i}_landscape.txt"
         landscape = loadtxt(file_name, dtype=bool)
         landscapes.append(landscape)
 
-        file_name = f"temp\\{file_root}{i}_dynamics.txt"
+        file_name = f"temp/{file_root}{i}_dynamics.txt"
         raw_data = open(file_name, "r").read()
         lines = raw_data.split("\n")
 
