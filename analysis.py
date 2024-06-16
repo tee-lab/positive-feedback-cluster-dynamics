@@ -1,7 +1,5 @@
-from numpy import loadtxt, zeros
-from os import path
+from numpy import array, loadtxt, zeros
 from pickle import dump
-from skimage.measure import label
 
 from utils import *
 
@@ -11,7 +9,7 @@ def cluster_size_distribution(landscapes, file_root):
     clusters_histogram = zeros(size * size, dtype=int)
     for landscape in landscapes:
         clusters_histogram += get_csd(landscape)[1:]
-    clusters_histogram = trim_list(clusters_histogram)
+    clusters_histogram = right_trim(clusters_histogram)
     
     output_string = ""
     for i in range(len(clusters_histogram)):
@@ -26,9 +24,38 @@ def cluster_size_distribution(landscapes, file_root):
     fp.close()
 
 
-def cluster_dynamics(clusters_before, clusters_after, file_root):
-    pass
+def cluster_dynamics(clusters_before, clusters_after, size, file_root):
+    length = len(clusters_before)
+    changes_histogram = {}
+    for i in range(-size * size, size * size):
+        changes_histogram[i] = 0
 
+    for i in range(length):
+        prominent_cluster_before = max(clusters_before[i])
+        prominent_cluster_after = max(clusters_after[i])
+        change = prominent_cluster_after - prominent_cluster_before
+        changes_histogram[change] += 1
+
+    for i in range(-size * size, size * size):
+        if changes_histogram[i] == 0:
+            del changes_histogram[i]
+        else:
+            break
+
+    for i in range(size * size - 1, -size * size, -1):
+        if changes_histogram[i] == 0:
+            del changes_histogram[i]
+        else:
+            break
+
+    output_string = ""
+    for key in changes_histogram.keys():
+        output_string += f"{key} {changes_histogram[key]}\n"
+
+    fp = open("outputs/" + file_root + "cd.txt", "w")
+    fp.write(output_string)
+    fp.close()
+    
 
 def analysis(simulation_name, num_simulations, parameters):
     clusters_before = []
@@ -55,6 +82,7 @@ def analysis(simulation_name, num_simulations, parameters):
             clusters_after.append(list(map(int, line_split[1].split())))
 
     cluster_size_distribution(landscapes, file_root)
+    cluster_dynamics(clusters_before, clusters_after, landscape.shape[0], file_root)
 
 
 if __name__ == '__main__':

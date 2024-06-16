@@ -4,7 +4,17 @@ from numpy.random import randint
 from skimage.measure import label
 
 
-def trim_list(list):
+def left_trim(list):
+    trim_index = -1
+    for i in range(len(list)):
+        if list[i] != 0:
+            trim_index = i
+            break
+
+    return list[trim_index:]
+
+
+def right_trim(list):
     trim_index = -1
     for i in range(len(list) - 1, -1, -1):
         if list[i] != 0:
