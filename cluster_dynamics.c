@@ -3,7 +3,7 @@
 #endif
 
 #include <stdio.h>
-#include "depth_search.c"
+#include "utils.c"
 
 void cluster_dynamics(int lattice[][SIZE], int x, int y, int *before, int *after) {
     int explored[SIZE][SIZE] = {0};

@@ -21,7 +21,7 @@ def process(simulation_name, simulation_index, parameters):
 if __name__ == '__main__':
     set_start_method('spawn')
     simulation_name = "tdp"
-    parameters = [0.72, 0]
+    parameters = [0.70, 0]
     num_simulations = 4
 
     file_root = ""
