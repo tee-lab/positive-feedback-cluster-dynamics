@@ -1,0 +1,1 @@
+scp -r chandan@10.58.97.41:/home/chandan/code/positive-feedback-cluster-dynamics/outputs "C:\Code\Github\positive-feedback-cluster-dynamics"

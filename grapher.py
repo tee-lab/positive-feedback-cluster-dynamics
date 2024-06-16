@@ -124,7 +124,7 @@ def plot_sde(data_path, file_root):
     plt.show()
 
 
-def grapher(simulation_name, parameters, data_path = "outputs/"):
+def grapher(simulation_name, parameters, data_path = "outputs\\"):
     if simulation_name == "tdp":
         p = parameters[0]
         q = parameters[1]

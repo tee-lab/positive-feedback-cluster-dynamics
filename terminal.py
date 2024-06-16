@@ -10,7 +10,7 @@ def process(simulation_name, simulation_index, parameters):
     if simulation_name == "tdp":
         p = parameters[0]
         q = parameters[1]
-        file_root = f"temp/tdp_{str(p).replace('.', 'p')}_{str(q).replace('.', 'q')}_{simulation_index}_"
+        file_root = f"temp\\tdp_{str(p).replace('.', 'p')}_{str(q).replace('.', 'q')}_{simulation_index}_"
 
         if name == "nt":
             run(f'tdp.exe {p} {q} {simulation_index} "{file_root}"', shell=True)
