@@ -1,5 +1,6 @@
-from numpy import array, loadtxt, zeros
+from numpy import array, histogram, loadtxt, zeros
 from pickle import dump
+from tqdm import tqdm
 
 from utils import *
 
@@ -30,7 +31,7 @@ def cluster_dynamics(clusters_before, clusters_after, size, file_root):
     for i in range(-size * size, size * size):
         changes_histogram[i] = 0
 
-    for i in range(length):
+    for i in tqdm(range(length)):
         prominent_cluster_before = max(clusters_before[i])
         prominent_cluster_after = max(clusters_after[i])
         change = prominent_cluster_after - prominent_cluster_before
@@ -55,7 +56,59 @@ def cluster_dynamics(clusters_before, clusters_after, size, file_root):
     fp = open("outputs/" + file_root + "cd.txt", "w")
     fp.write(output_string)
     fp.close()
+
+
+def cluster_sde(clusters_before, clusters_after, file_root):
+    cluster_changes = {}
+    length = len(clusters_before)
+
+    for i in tqdm(range(length)):
+        affected_cluster = max(clusters_before[i])
+        resulting_cluster = max(clusters_after[i])
+        change = resulting_cluster - affected_cluster
+
+        if affected_cluster in cluster_changes:
+            cluster_changes[affected_cluster].append(change)
+        else:
+            cluster_changes[affected_cluster] = [change]
+
+    cluster_sizes = []
+    drifts = []
+    diffusions = []
+    num_samples = []
+    residues = []
+
+    for cluster_size in sorted(cluster_changes.keys()):
+        changes = cluster_changes[cluster_size]
+        drift = sum(changes) / len(changes)
+        diffusion = sum([(change - drift) ** 2 for change in changes]) / len(changes) - drift ** 2
+
+        cluster_sizes.append(cluster_size)
+        drifts.append(drift)
+        diffusions.append(diffusion)
+        num_samples.append(len(changes))
+
+        if len(changes) > 100 and (cluster_size in [10, 30, 50, 100] or cluster_size % 200 == 0):
+            residue_list = [int(change - drift) for change in changes]
+            min_bin = min(residue_list) - 1
+            max_bin = max(residue_list) + 1
+
+            freq, bins = histogram(residue_list, bins=[i for i in range(min_bin, max_bin + 1)])
+            residues.append({
+                "size": i,
+                "min_bin": min_bin,
+                "max_bin": max_bin,
+                "freq": freq
+            })
+
+    output_string = ""
+    for i, cluster_size in enumerate(cluster_sizes):
+        output_string += f"{cluster_size} {drifts[i]} {diffusions[i]} {num_samples[i]}\n"
     
+    fp = open("outputs/" + file_root + "sde.txt", "w")
+    fp.write(output_string)
+    fp.close()
+
 
 def analysis(simulation_name, num_simulations, parameters):
     clusters_before = []
@@ -81,8 +134,14 @@ def analysis(simulation_name, num_simulations, parameters):
             clusters_before.append(list(map(int, line_split[0].split())))
             clusters_after.append(list(map(int, line_split[1].split())))
 
+    print("Calculating cluster size distribution ...")
     cluster_size_distribution(landscapes, file_root)
+
+    print("Calculating cluster dynamics ...")
     cluster_dynamics(clusters_before, clusters_after, landscape.shape[0], file_root)
+
+    print("Calculating cluster SDE ...")
+    cluster_sde(clusters_before, clusters_after, file_root)
 
 
 if __name__ == '__main__':

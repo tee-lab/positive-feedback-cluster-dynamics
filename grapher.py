@@ -71,7 +71,7 @@ def plot_cd(data_path, file_root):
     abs_changes = abs_changes[2:trim_index + 1]
     changes_icdf = changes_icdf[2:trim_index + 1]
 
-    plt.title("Cluster Dynamics")
+    plt.title("Cluster Dynamics (log-log)")
     plt.xlabel("$\Delta$s")
     plt.ylabel("$P(\Delta S \geq \Delta s)$")
     plt.loglog(abs_changes, changes_icdf)
@@ -79,13 +79,49 @@ def plot_cd(data_path, file_root):
     plt.show()
     plt.close()
 
-    plt.title("Cluster Dynamics")
+    plt.title("Cluster Dynamics (semilog-y)")
     plt.xlabel("$\Delta s$")
     plt.ylabel("$P(\Delta S \geq \Delta s)$")
     plt.semilogy(abs_changes, changes_icdf)
     plt.savefig(data_path + file_root + "cd_semilogy.png")
     plt.show()
     plt.close()
+
+
+def plot_sde(data_path, file_root):
+    file_name = data_path + file_root + "sde.txt"
+    data = transpose(loadtxt(file_name, dtype=float))
+    cluster_sizes, drifts, diffusions, num_samples = data[0], data[1], data[2], data[3]
+
+    samples_cutoff = 5000
+    index_cutoff = -1
+
+    for i in range(len(num_samples)):
+        if num_samples[i] < samples_cutoff:
+            index_cutoff = i
+            break
+
+    if index_cutoff < 2:
+        index_cutoff = 5
+
+    cluster_sizes = cluster_sizes[:index_cutoff]
+    drifts = drifts[:index_cutoff]
+    diffusions = diffusions[:index_cutoff]
+    
+    plt.title("Drift")
+    plt.xlabel("Cluster Size s")
+    plt.ylabel("f(s)")
+    plt.plot(cluster_sizes, drifts)
+    plt.axhline(0, color='black', linewidth=0.5)
+    plt.savefig(data_path + file_root + "drift.png")
+    plt.show()
+
+    plt.title("Diffusion")
+    plt.xlabel("Cluster Size s")
+    plt.ylabel("$g^2 (s)$")
+    plt.plot(cluster_sizes, diffusions)
+    plt.savefig(data_path + file_root + "diffusion.png")
+    plt.show()
 
 
 def grapher(simulation_name, parameters, data_path = "outputs/"):
@@ -96,9 +132,10 @@ def grapher(simulation_name, parameters, data_path = "outputs/"):
 
     plot_csd(data_path, file_root)
     plot_cd(data_path, file_root)
+    plot_sde(data_path, file_root)
 
 
 if __name__ == '__main__':
     simulation_name = "tdp"
-    parameters = [0.7, 0]
+    parameters = [0.65, 0]
     grapher(simulation_name, parameters)

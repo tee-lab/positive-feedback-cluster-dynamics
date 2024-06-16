@@ -21,8 +21,8 @@ def process(simulation_name, simulation_index, parameters):
 if __name__ == '__main__':
     set_start_method('spawn')
     simulation_name = "tdp"
-    parameters = [0.70, 0]
-    num_simulations = 4
+    parameters = [0.7, 0]
+    num_simulations = 24
     
     makedirs("temp", exist_ok=True)
     makedirs("outputs", exist_ok=True)
