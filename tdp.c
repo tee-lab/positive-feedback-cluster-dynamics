@@ -1,6 +1,6 @@
-#define SIZE 256
+#define SIZE 100
 #define EQUILIBRATION 1000
-#define SIMULATION 1000
+#define SIMULATION 10
 
 #ifdef _WIN32
     #include <io.h>
@@ -80,7 +80,8 @@ int main(int argc, char *argv[]) {
     float p = atof(argv[1]);
     float q = atof(argv[2]);
     int simulation_index = atoi(argv[3]);
-    char *file_root = argv[4];
+    char file_root[20];
+    strcpy(file_root, argv[4]);
 
     srand(getpid()); 
     int lattice[SIZE][SIZE];
@@ -118,30 +119,48 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+
+    // save lattice
+    char landscape_file_name[30];
+    strcat(landscape_file_name, file_root);
+    strcat(landscape_file_name, "landscape.txt");
+
+    FILE *landscape_file = fopen(landscape_file_name, "w");
+    if (landscape_file == NULL) {
+        printf("Error opening landscape file!\n");
+        exit(1);
+    }
+
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            fprintf(landscape_file, "%d ", lattice[i][j]);  
+        }
+        fprintf(landscape_file, "\n");
+    }
+    fclose(landscape_file);
     
-    char file_name[20];
-    strcat(file_name, file_root);
-    strcat(file_name, "dynamics.txt");
+    // save dynamics
+    char dynamics_file_name[30];
+    strcat(dynamics_file_name, file_root);
+    strcat(dynamics_file_name, "dynamics.txt");
 
-    FILE *file = fopen(file_name, "w");
-
-    if (file == NULL) {
-        printf("Error opening file!\n");
+    FILE *dynamics_file = fopen(dynamics_file_name, "w");
+    if (dynamics_file == NULL) {
+        printf("Error opening dynamics file!\n");
         exit(1);
     }
 
     dynamics_node *current = dynamics_list;
     while (current != NULL) {
         for (int i = 0; i < 4; i++) {
-            fprintf(file, "%d ", current->before[i]);
+            fprintf(dynamics_file, "%d ", current->before[i]);
         }
-        fprintf(file, ": ");
+        fprintf(dynamics_file, ": ");
         for (int i = 0; i < 4; i++) {
-            fprintf(file, "%d ", current->after[i]);
+            fprintf(dynamics_file, "%d ", current->after[i]);
         }
-        fprintf(file, "\n");
+        fprintf(dynamics_file, "\n");
         current = current->next;
     }
-
-    fclose(file);
+    fclose(dynamics_file);
 }

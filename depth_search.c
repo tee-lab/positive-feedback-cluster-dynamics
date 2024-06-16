@@ -4,7 +4,6 @@
 
 #include <stdio.h>
 #include "utils.c"
-#include "objects/coord_list.c"
 
 
 void print_explored(int explored[SIZE][SIZE]) {

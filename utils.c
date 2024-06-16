@@ -54,3 +54,13 @@ float get_density(int lattice[SIZE][SIZE]) {
     }
     return (float) count / (SIZE * SIZE);
 }
+
+void print_lattice(int lattice[SIZE][SIZE]) {
+    printf("\n");
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            printf("%d ", lattice[i][j]);
+        }
+        printf("\n");
+    }
+}
