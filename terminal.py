@@ -10,11 +10,13 @@ def process(simulation_name, simulation_index, parameters):
     if simulation_name == "tdp":
         p = parameters[0]
         q = parameters[1]
-        file_root = f"temp\\tdp_{str(p).replace('.', 'p')}_{str(q).replace('.', 'q')}_{simulation_index}_"
 
         if name == "nt":
+            file_root = f"temp\\tdp_{str(p).replace('.', 'p')}_{str(q).replace('.', 'q')}_{simulation_index}_"
             run(f'tdp.exe {p} {q} {simulation_index} "{file_root}"', shell=True)
         else:
+            file_root = "/home/chandan/code/positive-feedback-cluster-dynamics/temp/"
+            file_root += f"tdp_{str(p).replace('.', 'p')}_{str(q).replace('.', 'q')}_{simulation_index}_"
             run(f'./tdp {p} {q} {simulation_index} "{file_root}"', shell=True)
 
 
@@ -22,7 +24,7 @@ if __name__ == '__main__':
     set_start_method('spawn')
     simulation_name = "tdp"
     parameters = [0.7, 0]
-    num_simulations = 24
+    num_simulations = 1
     
     makedirs("temp", exist_ok=True)
     makedirs("outputs", exist_ok=True)

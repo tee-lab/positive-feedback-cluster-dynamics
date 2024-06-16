@@ -1,6 +1,6 @@
 #define SIZE 100
 #define EQUILIBRATION 1000
-#define SIMULATION 1000
+#define SIMULATION 10
 
 #ifdef _WIN32
     #include <io.h>
@@ -111,7 +111,6 @@ int main(int argc, char *argv[]) {
     if (simulation_index == 0) {
         printf("\n");
     }
-    
 
     if (SIMULATION) {
         int changed_x, changed_y;
@@ -131,7 +130,7 @@ int main(int argc, char *argv[]) {
     }
 
     // save lattice
-    char landscape_file_name[30];
+    char landscape_file_name[50];
     strcat(landscape_file_name, file_root);
     strcat(landscape_file_name, "landscape.txt");
 
@@ -150,7 +149,7 @@ int main(int argc, char *argv[]) {
     fclose(landscape_file);
     
     // save dynamics
-    char dynamics_file_name[30];
+    char dynamics_file_name[50];
     strcat(dynamics_file_name, file_root);
     strcat(dynamics_file_name, "dynamics.txt");
 
