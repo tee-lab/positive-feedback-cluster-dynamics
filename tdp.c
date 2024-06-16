@@ -1,6 +1,6 @@
 #define SIZE 100
 #define EQUILIBRATION 1000
-#define SIMULATION 1000
+#define SIMULATION 100
 
 #ifdef _WIN32
     #include <io.h>

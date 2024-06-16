@@ -1,5 +1,5 @@
 from multiprocessing import set_start_method, Pool
-from os import name, system
+from os import makedirs, name, system
 from subprocess import run
 
 from analysis import analysis
@@ -23,6 +23,9 @@ if __name__ == '__main__':
     simulation_name = "tdp"
     parameters = [0.70, 0]
     num_simulations = 4
+    
+    makedirs("temp", exist_ok=True)
+    makedirs("outputs", exist_ok=True)
 
     file_root = ""
     if simulation_name == "tdp":
