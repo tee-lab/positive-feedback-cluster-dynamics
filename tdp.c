@@ -1,6 +1,6 @@
 #define SIZE 100
 #define EQUILIBRATION 1000
-#define SIMULATION 10
+#define SIMULATION 1000
 
 #ifdef _WIN32
     #include <io.h>
@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
     float p = atof(argv[1]);
     float q = atof(argv[2]);
     int simulation_index = atoi(argv[3]);
-    char file_root[20];
+    char file_root[200];
     strcpy(file_root, argv[4]);
 
     srand(getpid()); 
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]) {
     }
 
     // save lattice
-    char landscape_file_name[50];
+    char landscape_file_name[200] = {'\0'};
     strcat(landscape_file_name, file_root);
     strcat(landscape_file_name, "landscape.txt");
 
@@ -149,7 +149,7 @@ int main(int argc, char *argv[]) {
     fclose(landscape_file);
     
     // save dynamics
-    char dynamics_file_name[50];
+    char dynamics_file_name[200] = {'\0'};
     strcat(dynamics_file_name, file_root);
     strcat(dynamics_file_name, "dynamics.txt");
 
