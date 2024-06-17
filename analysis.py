@@ -124,7 +124,7 @@ def cluster_sde(clusters_before, clusters_after, file_root):
 
             freq, bins = histogram(residue_list, bins=[i for i in range(min_bin, max_bin + 1)])
             residues.append({
-                "size": i,
+                "size": cluster_size,
                 "min_bin": min_bin,
                 "max_bin": max_bin,
                 "freq": freq
@@ -140,7 +140,7 @@ def cluster_sde(clusters_before, clusters_after, file_root):
 
     output_string = ""
     for i, cluster_size in enumerate(cluster_sizes):
-        output_string += f"{cluster_size} {growth_probabilities[i]} {decay_probabilities[i]}\n"
+        output_string += f"{cluster_size} {round(growth_probabilities[i], 4)} {round(decay_probabilities[i], 4)}\n"
 
     fp = open("outputs/" + file_root + "gd.txt", "w")
     fp.write(output_string)
@@ -159,6 +159,13 @@ def cluster_sde(clusters_before, clusters_after, file_root):
         output_string += f"{cluster_size} {avg_merge_change[i]} {avg_split_change[i]}\n"
 
     fp = open("outputs/" + file_root + "abrupt.txt", "w")
+    fp.write(output_string)
+    fp.close()
+
+    fp = open("outputs/" + file_root + "residues.txt", "w")
+    output_string = ""
+    for info in residues:
+        output_string += f"{info['size']} : {info['min_bin']}, {info['max_bin']} : {', '.join([str(val) for val in info['freq']])}\n"
     fp.write(output_string)
     fp.close()
 

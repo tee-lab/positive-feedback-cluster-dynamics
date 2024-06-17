@@ -112,7 +112,7 @@ def plot_sde(data_path, file_root):
     plt.xlabel("Cluster Size s")
     plt.ylabel("f(s)")
     plt.plot(cluster_sizes, drifts)
-    plt.axhline(0, color='black', linewidth=0.5)
+    plt.axhline(0, color='black', linestyle='dashed')
     plt.savefig(data_path + file_root + "drift.png")
     plt.show()
 
@@ -165,6 +165,56 @@ def plot_sde(data_path, file_root):
     plt.savefig(data_path + file_root + "abrupt.png")
     plt.show()
 
+    file_name = data_path + file_root + "residues.txt"
+    fp = open(file_name, "r")
+    lines = fp.read().split("\n")
+
+    for line in lines[:-1]:
+        section1, section2, section3 = line.split(" : ")
+        cluster_size = int(section1)
+        bins = list(map(int, section2.split(", ")))
+        freqs = list(map(int, section3.split(", ")))
+
+        bin_range = list(range(bins[0], bins[1]))
+        start_bin = bins[0]
+        end_bin = bins[-1]
+
+        abs_bins = range(0, max(abs(start_bin), abs(end_bin)) + 1)
+        abs_freqs = [0 for _ in range(len(abs_bins))]
+
+        for i, bin in enumerate(bin_range):
+            abs_bin = abs(bin)
+            abs_freqs[abs_bin] += freqs[i]
+
+        plt.subplots(2, 2, figsize=(10, 10))
+
+        plt.subplot(2, 2, 1)           
+        plt.title(f"Residue Distribution for Cluster Size {cluster_size}")
+        plt.xlabel("Residues")
+        plt.ylabel("Frequencies")
+        plt.bar(bin_range, freqs)
+        
+        plt.subplot(2, 2, 2)
+        plt.title(f"Absolute Residue Distribution")
+        plt.xlabel("|Residues|")
+        plt.ylabel("Frequencies")
+        plt.bar(abs_bins, abs_freqs)
+
+        plt.subplot(2, 2, 3)
+        plt.title(f"Absolute Residue Distribution (log-log)")
+        plt.xlabel("|Residues|")
+        plt.ylabel("Frequencies")
+        plt.loglog(abs_bins, abs_freqs, "o")
+
+        plt.subplot(2, 2, 4)
+        plt.title(f"Absolute Residue Distribution (semilog-y)")
+        plt.xlabel("|Residues|")
+        plt.ylabel("Frequencies")
+        plt.semilogy(abs_bins, abs_freqs, "o")
+        plt.savefig(data_path + file_root + f"residues_{cluster_size}.png")
+        plt.show()
+
+
 
 def grapher(simulation_name, parameters, data_path = "outputs/"):
     if simulation_name == "tdp":
@@ -172,8 +222,8 @@ def grapher(simulation_name, parameters, data_path = "outputs/"):
         q = parameters[1]
         file_root = f"tdp_{str(p).replace('.', 'p')}_{str(q).replace('.', 'q')}_"
 
-    plot_csd(data_path, file_root)
-    plot_cd(data_path, file_root)
+    # plot_csd(data_path, file_root)
+    # plot_cd(data_path, file_root)
     plot_sde(data_path, file_root)
 
 
