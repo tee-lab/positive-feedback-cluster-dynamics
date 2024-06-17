@@ -238,7 +238,7 @@ def grapher(simulation_name, parameters, data_path = "outputs/"):
 if __name__ == '__main__':
     simulation_name = "tdp"
     dataset = "100x100_23"
-    parameters = [0.72, 0]
+    parameters = [0.7, 0]
     base_path = f"results/{simulation_name}/{dataset}/"
 
     if simulation_name == "tdp":
@@ -247,4 +247,4 @@ if __name__ == '__main__':
         simulation_folder = f"tdp_{p}_{q}"
         base_path += f"{simulation_folder}/"
 
-    grapher(simulation_name, parameters, base_path)
+    grapher(simulation_name, parameters)

@@ -93,20 +93,20 @@ def cluster_sde(clusters_before, clusters_after, file_root):
     avg_merge_change, avg_split_change = [], []
 
     for cluster_size in tqdm(sorted(cluster_changes.keys())):
-        changes = cluster_changes[cluster_size]
-        drift = sum(changes) / len(changes)
+        changes = array(cluster_changes[cluster_size])
+        drift = changes.mean()
         diffusion = sum([(change - drift) ** 2 for change in changes]) / len(changes) - drift ** 2
 
         cluster_sizes.append(cluster_size)
         drifts.append(drift)
         diffusions.append(diffusion)
         num_samples.append(len(changes))
-        growth_probabilities.append(sum([change > 0 for change in changes]) / len(changes))
-        decay_probabilities.append(sum([change < 0 for change in changes]) / len(changes))
-        num_growths.append(sum([change == 1 for change in changes]))
-        num_decays.append(sum([change == -1 for change in changes]))
-        num_merges.append(sum([change > 1 for change in changes]))
-        num_splits.append(sum([change < -1 for change in changes]))
+        growth_probabilities.append(sum(changes > 0) / len(changes))
+        decay_probabilities.append(sum(changes < 0) / len(changes))
+        num_growths.append(sum(changes == 1))
+        num_decays.append(sum(changes == -1))
+        num_merges.append(sum(changes > 1))
+        num_splits.append(sum(changes < 1))
 
         if num_merges[-1] != 0:
             avg_merge_change.append(sum([change for change in changes if change > 1]) / num_merges[-1])
