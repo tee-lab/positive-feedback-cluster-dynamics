@@ -13,6 +13,15 @@ def organize(simulation_name, parameter_values):
             for output_file in listdir(output_path):
                 if output_file.startswith(prefix):
                     move(output_path + output_file, output_path + prefix)
+    elif simulation_name == "scanlon":
+        for parameters in parameter_values:
+            rainfall = parameters[0]
+            prefix = f"scanlon_{str(rainfall).replace('.', 'p')}"
+            makedirs(output_path + prefix, exist_ok=True)
+
+            for output_file in listdir(output_path):
+                if output_file.startswith(prefix):
+                    move(output_path + output_file, output_path + prefix)
 
 
 
@@ -29,6 +38,13 @@ if __name__ == '__main__':
         [0.51, 0.5],
         [0.535, 0.5],
         [0.55, 0.5]
+    ]
+
+    simulation_name = "scanlon"
+    parameter_values = [
+        [500],
+        [770],
+        [850]
     ]
 
     organize(simulation_name, parameter_values)

@@ -57,12 +57,12 @@ if __name__ == '__main__':
     makedirs("temp", exist_ok=True)
     makedirs("outputs", exist_ok=True)
     set_start_method('spawn')
-    num_simulations = 4
+    num_simulations = cpu_count() - 1
 
-    simulation_name = "tdp"
-    parameter_values = [
-        [0.7, 0]
-    ]
+    # simulation_name = "tdp"
+    # parameter_values = [
+    #     [0.7, 0]
+    # ]
 
     # simulation_name = "tdp"
     # parameter_values = [
@@ -83,9 +83,17 @@ if __name__ == '__main__':
     #     [850]
     # ]
 
-    # simulation_name = "null"
-    # parameter_values = [
-    #     [0.25]
-    # ]
+    simulation_name = "null"
+    parameter_values = [
+        [0.25],
+        [0.26],
+        [0.27],
+        [0.45],
+        [0.48],
+        [0.49],
+        [0.53],
+        [0.54],
+        [0.56]
+    ]
     
     run_simulation(simulation_name, parameter_values)
