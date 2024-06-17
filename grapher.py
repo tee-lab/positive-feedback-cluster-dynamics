@@ -130,12 +130,40 @@ def plot_sde(data_path, file_root):
     plt.title("Growth and Decay Probabiities")
     plt.xlabel("Cluster Size s")
     plt.ylabel("Probability")
-    plt.plot(cluster_sizes[:index_cutoff], growth_prob[:index_cutoff], label="Growth")
-    plt.plot(cluster_sizes[:index_cutoff], decay_prob[:index_cutoff], label="Decay")
+    plt.plot(cluster_sizes[:index_cutoff], growth_prob[:index_cutoff], label="Net Growth")
+    plt.plot(cluster_sizes[:index_cutoff], decay_prob[:index_cutoff], label="Net Decay")
     plt.legend()
     plt.savefig(data_path + file_root + "gd.png")
     plt.show()
     plt.close()
+
+    file_name = data_path + file_root + "processes.txt"
+    data = transpose(loadtxt(file_name, dtype=int))
+    cluster_sizes, num_growths, num_decays, num_merges, num_splits = data[0], data[1], data[2], data[3], data[4]
+
+    plt.title("Number of processes undergone by clusters of different sizes")
+    plt.xlabel("Cluster Size s")
+    plt.ylabel("Number of Processes")
+    plt.plot(cluster_sizes[:index_cutoff], num_growths[:index_cutoff], label="Growth")
+    plt.plot(cluster_sizes[:index_cutoff], num_decays[:index_cutoff], label="Decay")
+    plt.plot(cluster_sizes[:index_cutoff], num_merges[:index_cutoff], label="Merge")
+    plt.plot(cluster_sizes[:index_cutoff], num_splits[:index_cutoff], label="Split")
+    plt.legend()
+    plt.savefig(data_path + file_root + "processes.png")
+    plt.show()
+
+    file_name = data_path + file_root + "abrupt.txt"
+    data = transpose(loadtxt(file_name, dtype=float))
+    cluster_sizes, avg_merge_change, avg_split_change = data[0], data[1], data[2]
+
+    plt.title("Average change in cluster size due to abrupt processes")
+    plt.xlabel("Cluster Size s")
+    plt.ylabel("Average Change")
+    plt.plot(cluster_sizes[:index_cutoff], avg_merge_change[:index_cutoff], label="Merge")
+    plt.plot(cluster_sizes[:index_cutoff], -avg_split_change[:index_cutoff], label="Split")
+    plt.legend()
+    plt.savefig(data_path + file_root + "abrupt.png")
+    plt.show()
 
 
 def grapher(simulation_name, parameters, data_path = "outputs/"):
