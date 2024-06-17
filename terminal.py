@@ -1,4 +1,4 @@
-from multiprocessing import set_start_method, Pool
+from multiprocessing import set_start_method, Pool, cpu_count
 from os import makedirs, name, system
 from subprocess import run
 
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     makedirs("temp", exist_ok=True)
     makedirs("outputs", exist_ok=True)
     set_start_method('spawn')
-    num_simulations = 4
+    num_simulations = cpu_count() - 1
 
     simulation_name = "tdp"
     parameter_values = [
