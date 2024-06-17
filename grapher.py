@@ -123,6 +123,20 @@ def plot_sde(data_path, file_root):
     plt.savefig(data_path + file_root + "diffusion.png")
     plt.show()
 
+    file_name = data_path + file_root + "gd.txt"
+    data = transpose(loadtxt(file_name, dtype=float))
+    cluster_sizes, growth_prob, decay_prob = data[0], data[1], data[2]
+
+    plt.title("Growth and Decay Probabiities")
+    plt.xlabel("Cluster Size s")
+    plt.ylabel("Probability")
+    plt.plot(cluster_sizes[:index_cutoff], growth_prob[:index_cutoff], label="Growth")
+    plt.plot(cluster_sizes[:index_cutoff], decay_prob[:index_cutoff], label="Decay")
+    plt.legend()
+    plt.savefig(data_path + file_root + "gd.png")
+    plt.show()
+    plt.close()
+
 
 def grapher(simulation_name, parameters, data_path = "outputs/"):
     if simulation_name == "tdp":
@@ -137,5 +151,5 @@ def grapher(simulation_name, parameters, data_path = "outputs/"):
 
 if __name__ == '__main__':
     simulation_name = "tdp"
-    parameters = [0.65, 0]
+    parameters = [0.7, 0]
     grapher(simulation_name, parameters)

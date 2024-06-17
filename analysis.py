@@ -1,3 +1,4 @@
+from multiprocessing import Pool
 from numpy import array, histogram, loadtxt, zeros
 from pickle import dump
 from tqdm import tqdm
@@ -17,6 +18,18 @@ def cluster_size_distribution(landscapes, file_root):
         output_string += f"{i + 1} {clusters_histogram[i]}\n"
 
     fp = open("outputs/" + file_root + "csd.txt", "w")
+    fp.write(output_string)
+    fp.close()
+
+    densities = []
+    for landscape in landscapes:
+        densities.append(landscape.sum() / (size * size))
+
+    output_string = ""
+    for i in range(len(densities)):
+        output_string += f"{i} {densities[i]}\n"
+    
+    fp = open("outputs/" + file_root + "densities.txt", "w")
     fp.write(output_string)
     fp.close()
 
@@ -73,20 +86,23 @@ def cluster_sde(clusters_before, clusters_after, file_root):
             cluster_changes[affected_cluster] = [change]
 
     cluster_sizes = []
-    drifts = []
-    diffusions = []
-    num_samples = []
-    residues = []
+    drifts, diffusions = [], []
+    num_samples, residues = [], []
+    growth_probabilities, decay_probabilities = [], []
 
-    for cluster_size in sorted(cluster_changes.keys()):
+    for cluster_size in tqdm(sorted(cluster_changes.keys())):
         changes = cluster_changes[cluster_size]
         drift = sum(changes) / len(changes)
         diffusion = sum([(change - drift) ** 2 for change in changes]) / len(changes) - drift ** 2
+        growth_probability = sum([change > 0 for change in changes]) / len(changes)
+        decay_probability = sum([change < 0 for change in changes]) / len(changes)
 
         cluster_sizes.append(cluster_size)
         drifts.append(drift)
         diffusions.append(diffusion)
         num_samples.append(len(changes))
+        growth_probabilities.append(growth_probability)
+        decay_probabilities.append(decay_probability)
 
         if len(changes) > 100 and (cluster_size in [10, 30, 50, 100] or cluster_size % 200 == 0):
             residue_list = [int(change - drift) for change in changes]
@@ -109,6 +125,38 @@ def cluster_sde(clusters_before, clusters_after, file_root):
     fp.write(output_string)
     fp.close()
 
+    output_string = ""
+    for i, cluster_size in enumerate(cluster_sizes):
+        output_string += f"{cluster_size} {growth_probabilities[i]} {decay_probabilities[i]}\n"
+
+    fp = open("outputs/" + file_root + "gd.txt", "w")
+    fp.write(output_string)
+    fp.close()
+
+
+def read_file(file_root, simulation_index):
+    file_name = f"temp/{file_root}{simulation_index}_landscape.txt"
+    landscape = loadtxt(file_name, dtype=bool)
+
+    clusters_before = []
+    clusters_after = []
+
+    file_name = f"temp/{file_root}{simulation_index}_dynamics.txt"
+    raw_data = open(file_name, "r").read()
+    lines = raw_data.split("\n")
+
+    if simulation_index == 0:
+        iterator = tqdm(range(len(lines) - 1))
+    else:
+        iterator = range(len(lines) - 1)
+
+    for line_index in iterator:
+        line_split = lines[line_index].split(":")
+        clusters_before.append(list(map(int, line_split[0].split())))
+        clusters_after.append(list(map(int, line_split[1].split())))
+
+    return landscape, clusters_before, clusters_after
+
 
 def analysis(simulation_name, num_simulations, parameters):
     clusters_before = []
@@ -120,19 +168,14 @@ def analysis(simulation_name, num_simulations, parameters):
         q = parameters[1]
         file_root = f"tdp_{str(p).replace('.', 'p')}_{str(q).replace('.', 'q')}_"
 
-    for i in range(num_simulations):
-        file_name = f"temp/{file_root}{i}_landscape.txt"
-        landscape = loadtxt(file_name, dtype=bool)
+    print("Reading files ...")
+    with Pool(num_simulations) as p:
+        data = p.starmap(read_file, [(file_root, i) for i in range(num_simulations)])
+
+    for landscape, clusters_before_i, clusters_after_i in data:
         landscapes.append(landscape)
-
-        file_name = f"temp/{file_root}{i}_dynamics.txt"
-        raw_data = open(file_name, "r").read()
-        lines = raw_data.split("\n")
-
-        for line in lines[:-1]:
-            line_split = line.split(":")
-            clusters_before.append(list(map(int, line_split[0].split())))
-            clusters_after.append(list(map(int, line_split[1].split())))
+        clusters_before += clusters_before_i
+        clusters_after += clusters_after_i
 
     print("Calculating cluster size distribution ...")
     cluster_size_distribution(landscapes, file_root)

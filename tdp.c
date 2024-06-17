@@ -1,6 +1,6 @@
 #define SIZE 100
 #define EQUILIBRATION 1000
-#define SIMULATION 1000
+#define SIMULATION 100
 
 #ifdef _WIN32
     #include <io.h>
@@ -101,15 +101,11 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    for (int i = 0; i < EQUILIBRATION; i++) {
-        if (simulation_index == 0) {
-            printf("\33[2K\r");
-            printf("Equilibration: %f", (float) i * 100 / EQUILIBRATION);
-        }
-        landscape_update(lattice, p, q);
-    }
     if (simulation_index == 0) {
-        printf("\n");
+        printf("Equilibrating (takes a few seconds) ...");
+    }
+    for (int i = 0; i < EQUILIBRATION; i++) {
+        landscape_update(lattice, p, q);
     }
 
     if (SIMULATION) {
@@ -117,8 +113,7 @@ int main(int argc, char *argv[]) {
         int before[4], after[4];
         for (int i = 0; i < SIMULATION; i++) {
             if (simulation_index == 0) {
-                printf("\33[2K\r");
-                printf("Simulation: %f", (float) i * 100 / SIMULATION);
+                printf("Simulating update %d of %d\n", i + 1, SIMULATION);
             }
             for (int j = 0; j < SIZE * SIZE; j++) {
                 if (single_update(lattice, p, q, &changed_x, &changed_y)) {
