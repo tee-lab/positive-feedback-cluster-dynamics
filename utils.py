@@ -4,6 +4,12 @@ from numpy.random import randint
 from skimage.measure import label
 
 
+def delete_files_in_dir(path):
+    import os
+    for file in os.listdir(path):
+        os.remove(path + file)
+
+
 def left_trim(list):
     trim_index = -1
     for i in range(len(list)):
@@ -57,5 +63,4 @@ def apply_periodic_boundary(labels):
 
 
 if __name__ == '__main__':
-    landscape = randint(0, 2, (10, 10))
-    get_csd(landscape)
+    delete_files_in_dir("temp/")

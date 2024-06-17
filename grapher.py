@@ -93,7 +93,7 @@ def plot_sde(data_path, file_root):
     data = transpose(loadtxt(file_name, dtype=float))
     cluster_sizes, drifts, diffusions, num_samples = data[0], data[1], data[2], data[3]
 
-    samples_cutoff = 5000
+    samples_cutoff = 1000
     index_cutoff = -1
 
     for i in range(len(num_samples)):
@@ -179,15 +179,13 @@ def plot_sde(data_path, file_root):
         start_bin = bins[0]
         end_bin = bins[-1]
 
-        abs_bins = range(0, max(abs(start_bin), abs(end_bin)) + 1)
-        abs_freqs = [0 for _ in range(len(abs_bins))]
-
-        for i, bin in enumerate(bin_range):
-            abs_bin = abs(bin)
-            abs_freqs[abs_bin] += freqs[i]
+        zero_index = -1
+        for i in range(len(bin_range)):
+            if bin_range[i] == 0:
+                zero_index = i
+                break
 
         plt.subplots(2, 2, figsize=(10, 10))
-
         plt.subplot(2, 2, 1)           
         plt.title(f"Residue Distribution for Cluster Size {cluster_size}")
         plt.xlabel("Residues")
@@ -195,25 +193,24 @@ def plot_sde(data_path, file_root):
         plt.bar(bin_range, freqs)
         
         plt.subplot(2, 2, 2)
-        plt.title(f"Absolute Residue Distribution")
-        plt.xlabel("|Residues|")
+        plt.title(f"Positive Residue Distribution")
+        plt.xlabel("Residues")
         plt.ylabel("Frequencies")
-        plt.bar(abs_bins, abs_freqs)
+        plt.bar(bin_range[zero_index:], freqs[zero_index:])
 
         plt.subplot(2, 2, 3)
         plt.title(f"Absolute Residue Distribution (log-log)")
         plt.xlabel("|Residues|")
         plt.ylabel("Frequencies")
-        plt.loglog(abs_bins, abs_freqs, "o")
+        plt.loglog(bin_range[zero_index:], freqs[zero_index:], "o")
 
         plt.subplot(2, 2, 4)
         plt.title(f"Absolute Residue Distribution (semilog-y)")
         plt.xlabel("|Residues|")
         plt.ylabel("Frequencies")
-        plt.semilogy(abs_bins, abs_freqs, "o")
+        plt.semilogy(bin_range[zero_index:], freqs[zero_index:], "o")
         plt.savefig(data_path + file_root + f"residues_{cluster_size}.png")
         plt.show()
-
 
 
 def grapher(simulation_name, parameters, data_path = "outputs/"):
@@ -222,12 +219,12 @@ def grapher(simulation_name, parameters, data_path = "outputs/"):
         q = parameters[1]
         file_root = f"tdp_{str(p).replace('.', 'p')}_{str(q).replace('.', 'q')}_"
 
-    # plot_csd(data_path, file_root)
-    # plot_cd(data_path, file_root)
+    plot_csd(data_path, file_root)
+    plot_cd(data_path, file_root)
     plot_sde(data_path, file_root)
 
 
 if __name__ == '__main__':
     simulation_name = "tdp"
-    parameters = [0.7, 0]
+    parameters = [0.72, 0]
     grapher(simulation_name, parameters)

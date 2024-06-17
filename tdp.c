@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
     dynamics_node *dynamics_list;
 
     if (simulation_index == 0) {
-        printf("Simulating p = %f, q = %f\n", p, q);
+        printf("---> Simulating p = %f, q = %f <---\n", p, q);
     }
 
     int random_value;
@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (simulation_index == 0) {
-        printf("Equilibrating (takes a few seconds) ...");
+        printf("Equilibrating (takes a few seconds) ...\n");
     }
     for (int i = 0; i < EQUILIBRATION; i++) {
         landscape_update(lattice, p, q);
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
         int before[4], after[4];
         for (int i = 0; i < SIMULATION; i++) {
             if (simulation_index == 0) {
-                printf("Simulating update %d of %d\n", i + 1, SIMULATION);
+                printf("(%f, %f) Simulating update %d of %d\n", p, q, i + 1, SIMULATION);
             }
             for (int j = 0; j < SIZE * SIZE; j++) {
                 if (single_update(lattice, p, q, &changed_x, &changed_y)) {

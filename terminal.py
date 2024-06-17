@@ -4,9 +4,10 @@ from subprocess import run
 
 from analysis import analysis
 from grapher import grapher
+from utils import *
 
 
-def process(simulation_name, simulation_index, parameters):
+def child_process(simulation_name, simulation_index, parameters):
     if simulation_name == "tdp":
         p = parameters[0]
         q = parameters[1]
@@ -18,21 +19,31 @@ def process(simulation_name, simulation_index, parameters):
             run(f'./tdp {p} {q} {simulation_index} "{file_root}"', shell=True)
 
 
+def run_simulation(simulation_name, parameter_values):
+    if simulation_name == "tdp":
+        system(f"gcc tdp.c -o tdp") 
+
+    for parameters in parameter_values:
+        delete_files_in_dir("temp/")
+         
+        with Pool(num_simulations) as p:
+            p.starmap(child_process, [(simulation_name, i, parameters) for i in range(num_simulations)])
+
+        analysis(simulation_name, num_simulations, parameters)
+        grapher(simulation_name, parameters)
+
+
 if __name__ == '__main__':
-    set_start_method('spawn')
-    simulation_name = "tdp"
-    parameters = [0.7, 0]
-    num_simulations = 4
-    
     makedirs("temp", exist_ok=True)
     makedirs("outputs", exist_ok=True)
+    set_start_method('spawn')
+    num_simulations = 4
 
-    file_root = ""
-    if simulation_name == "tdp":
-        system(f"gcc tdp.c -o tdp")  
-
-    with Pool(num_simulations) as p:
-        p.starmap(process, [(simulation_name, i, parameters) for i in range(num_simulations)])
-
-    analysis(simulation_name, num_simulations, parameters)
-    grapher(simulation_name, parameters)
+    simulation_name = "tdp"
+    parameter_values = [
+        [0.65, 0],
+        [0.7, 0],
+        [0.72, 0],
+    ]
+    
+    run_simulation(simulation_name, parameter_values)
