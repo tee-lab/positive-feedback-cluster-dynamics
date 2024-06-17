@@ -203,6 +203,9 @@ def analysis(simulation_name, num_simulations, parameters):
         p = parameters[0]
         q = parameters[1]
         file_root = f"tdp_{str(p).replace('.', 'p')}_{str(q).replace('.', 'q')}_"
+    elif simulation_name == "null":
+        f = parameters[0]
+        file_root = f"null_{str(f).replace('.', 'p')}_"
 
     print("Reading files ...")
     with Pool(num_simulations) as p:

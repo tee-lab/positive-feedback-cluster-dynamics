@@ -17,11 +17,21 @@ def child_process(simulation_name, simulation_index, parameters):
             run(f'tdp.exe {p} {q} {simulation_index} "{file_root}"', shell=True)
         else:
             run(f'./tdp {p} {q} {simulation_index} "{file_root}"', shell=True)
+    elif simulation_name == "null":
+        f = parameters[0]
+        file_root = f"temp/null_{str(f).replace('.', 'p')}_{simulation_index}_"
+
+        if name == "nt":
+            run(f'null_model.exe {f} {simulation_index} "{file_root}"', shell=True)
+        else:
+            run(f'./null_model {f} {simulation_index} "{file_root}"', shell=True)
 
 
 def run_simulation(simulation_name, parameter_values):
     if simulation_name == "tdp":
         system(f"gcc tdp.c -o tdp") 
+    elif simulation_name == "null":
+        system(f"gcc null_model.c -o null_model")
 
     for parameters in parameter_values:
         delete_files_in_dir("temp/")
@@ -39,16 +49,21 @@ if __name__ == '__main__':
     set_start_method('spawn')
     num_simulations = cpu_count() - 1
 
-    simulation_name = "tdp"
+    # simulation_name = "tdp"
     # parameter_values = [
     #     [0.65, 0],
     #     [0.7, 0],
     #     [0.72, 0],
     # ]
+    # parameter_values = [
+    #     [0.51, 0.5],
+    #     [0.535, 0.5],
+    #     [0.55, 0.5]
+    # ]
+
+    simulation_name = "null"
     parameter_values = [
-        [0.51, 0.5],
-        [0.535, 0.5],
-        [0.55, 0.5]
+        [0.25]
     ]
     
     run_simulation(simulation_name, parameter_values)

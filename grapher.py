@@ -223,6 +223,9 @@ def grapher(simulation_name, parameters, data_path = "outputs/"):
         p = parameters[0]
         q = parameters[1]
         file_root = f"tdp_{str(p).replace('.', 'p')}_{str(q).replace('.', 'q')}_"
+    elif simulation_name == "null":
+        f = parameters[0]
+        file_root = f"null_{str(f).replace('.', 'p')}_"
 
     plot_csd(data_path, file_root)
     plot_cd(data_path, file_root)
