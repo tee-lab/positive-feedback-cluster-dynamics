@@ -12,7 +12,6 @@ def organize(simulation_name, parameter_values):
 
             for output_file in listdir(output_path):
                 if output_file.startswith(prefix):
-                    print(f"Moving {output_file} to {prefix}")
                     move(output_path + output_file, output_path + prefix)
 
 

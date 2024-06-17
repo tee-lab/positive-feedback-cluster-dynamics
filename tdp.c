@@ -167,6 +167,8 @@ int main(int argc, char *argv[]) {
         current = current->next;
     }
     fclose(dynamics_file);
+
+    return 0;
 }
 
 void landscape_update(int lattice[SIZE][SIZE], float p, float q) {

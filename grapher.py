@@ -115,6 +115,7 @@ def plot_sde(data_path, file_root):
     plt.axhline(0, color='black', linestyle='dashed')
     plt.savefig(data_path + file_root + "drift.png")
     plt.show()
+    plt.close()
 
     plt.title("Diffusion")
     plt.xlabel("Cluster Size s")
@@ -122,6 +123,7 @@ def plot_sde(data_path, file_root):
     plt.plot(cluster_sizes, diffusions)
     plt.savefig(data_path + file_root + "diffusion.png")
     plt.show()
+    plt.close()
 
     file_name = data_path + file_root + "gd.txt"
     data = transpose(loadtxt(file_name, dtype=float))
@@ -151,6 +153,7 @@ def plot_sde(data_path, file_root):
     plt.legend()
     plt.savefig(data_path + file_root + "processes.png")
     plt.show()
+    plt.close()
 
     file_name = data_path + file_root + "abrupt.txt"
     data = transpose(loadtxt(file_name, dtype=float))
@@ -164,6 +167,7 @@ def plot_sde(data_path, file_root):
     plt.legend()
     plt.savefig(data_path + file_root + "abrupt.png")
     plt.show()
+    plt.close()
 
     file_name = data_path + file_root + "residues.txt"
     fp = open(file_name, "r")
@@ -211,6 +215,7 @@ def plot_sde(data_path, file_root):
         plt.semilogy(bin_range[zero_index:], freqs[zero_index:], "o")
         plt.savefig(data_path + file_root + f"residues_{cluster_size}.png")
         plt.show()
+        plt.close()
 
 
 def grapher(simulation_name, parameters, data_path = "outputs/"):
@@ -226,5 +231,14 @@ def grapher(simulation_name, parameters, data_path = "outputs/"):
 
 if __name__ == '__main__':
     simulation_name = "tdp"
+    dataset = "100x100_23"
     parameters = [0.72, 0]
-    grapher(simulation_name, parameters)
+    base_path = f"results/{simulation_name}/{dataset}/"
+
+    if simulation_name == "tdp":
+        p = str(parameters[0]).replace('.', 'p')
+        q = str(parameters[1]).replace('.', 'q')
+        simulation_folder = f"tdp_{p}_{q}"
+        base_path += f"{simulation_folder}/"
+
+    grapher(simulation_name, parameters, base_path)
