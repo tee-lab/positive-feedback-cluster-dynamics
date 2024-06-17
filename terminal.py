@@ -17,6 +17,14 @@ def child_process(simulation_name, simulation_index, parameters):
             run(f'tdp.exe {p} {q} {simulation_index} "{file_root}"', shell=True)
         else:
             run(f'./tdp {p} {q} {simulation_index} "{file_root}"', shell=True)
+    elif simulation_name == "scanlon":
+        rainfall = parameters[0]
+        file_root = f"temp/scanlon_{str(rainfall).replace('.', 'p')}_{simulation_index}_"
+
+        if name == "nt":
+            run(f'scanlon.exe {rainfall} {simulation_index} "{file_root}"', shell=True)
+        else:
+            run(f'./scanlon {rainfall} {simulation_index} "{file_root}"', shell=True)
     elif simulation_name == "null":
         f = parameters[0]
         file_root = f"temp/null_{str(f).replace('.', 'p')}_{simulation_index}_"
@@ -30,6 +38,8 @@ def child_process(simulation_name, simulation_index, parameters):
 def run_simulation(simulation_name, parameter_values):
     if simulation_name == "tdp":
         system(f"gcc tdp.c -o tdp") 
+    elif simulation_name == "scanlon":
+        system(f"gcc scanlon.c -o scanlon")
     elif simulation_name == "null":
         system(f"gcc null_model.c -o null_model")
 
@@ -61,9 +71,14 @@ if __name__ == '__main__':
     #     [0.55, 0.5]
     # ]
 
-    simulation_name = "null"
+    simulation_name = "scanlon"
     parameter_values = [
-        [0.25]
+        [500]
     ]
+
+    # simulation_name = "null"
+    # parameter_values = [
+    #     [0.25]
+    # ]
     
     run_simulation(simulation_name, parameter_values)
