@@ -28,31 +28,30 @@ int single_update(int lattice[SIZE][SIZE], float m, float r, int *changed_x, int
     float random_number;
     int updated = 0;
 
-    for (int i = 0; i < SIZE * SIZE; i++) {
-        random_i = rand() % SIZE;
-        random_j = rand() % SIZE;
+    random_i = rand() % SIZE;
+    random_j = rand() % SIZE;
 
-        if (lattice[random_i][random_j] == 0) {
-            random_number = (float) rand() / RAND_MAX;
+    if (lattice[random_i][random_j] == 0) {
+        random_number = (float) rand() / RAND_MAX;
 
-            if (random_number < r) {
-                lattice[random_i][random_j] = 1;
-                *changed_x = random_i;
-                *changed_y = random_j;
-                updated = 1;
-            }
-        }
-        else {
-            random_number = (float) rand() / RAND_MAX;
-
-            if (random_number < m) {
-                lattice[random_i][random_j] = 0;
-                *changed_x = random_i;
-                *changed_y = random_j;
-                updated = 1;
-            }
+        if (random_number < r) {
+            lattice[random_i][random_j] = 1;
+            *changed_x = random_i;
+            *changed_y = random_j;
+            updated = 1;
         }
     }
+    else {
+        random_number = (float) rand() / RAND_MAX;
+
+        if (random_number < m) {
+            lattice[random_i][random_j] = 0;
+            *changed_x = random_i;
+            *changed_y = random_j;
+            updated = 1;
+        }
+    }
+    
     return updated;
 }
 
