@@ -73,7 +73,9 @@ if __name__ == '__main__':
 
     simulation_name = "scanlon"
     parameter_values = [
-        [500]
+        [500],
+        [770],
+        [850]
     ]
 
     # simulation_name = "null"
