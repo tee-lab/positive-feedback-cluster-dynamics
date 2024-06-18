@@ -4,14 +4,14 @@ from tqdm import tqdm
 from utils import get_file_root
 
 
-def load_drift(model_name, dataset, param, limit):
+def load_diffusion(model_name, dataset, param, limit):
     file_root = get_file_root(model_name, param)
     file_name = f"{base_path}/{model_name}/{dataset}/{file_root}/{file_root}_sde.txt"
     data = transpose(loadtxt(file_name, dtype=float))
-    cluster_sizes, drift, num_samples = data[0], data[1], data[3]
+    cluster_sizes, diffusion, num_samples = data[0], data[2], data[3]
 
     if model_name != "null_model":
-        return cluster_sizes[:limit], drift[:limit]
+        return cluster_sizes[:limit], diffusion[:limit]
     else:
         limit = -1
         for i in range(len(cluster_sizes)):
@@ -21,7 +21,7 @@ def load_drift(model_name, dataset, param, limit):
         if limit == -1:
             limit = 10
 
-        return cluster_sizes[:limit], drift[:limit]
+        return cluster_sizes[:limit], diffusion[:limit]
 
 
 if __name__ == '__main__':
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     num_rows = len(model_names)
     num_cols = 3
     fig, axs = plt.subplots(nrows=num_rows, ncols=1, constrained_layout=True, figsize=(8.27, 8.27 * num_rows / num_cols + 2))
-    fig.suptitle('Growth Rate of Clusters')
+    fig.suptitle('Variance in Growth Rate of Clusters')
 
     # clear subplots
     for ax in axs:
@@ -87,7 +87,6 @@ if __name__ == '__main__':
 
         for col, ax in enumerate(axs):
             ax.set_title(chr(65 + row) + str(col + 1), loc="left")
-            ax.axhline(y=0, linestyle="--", color="k")
 
             if col == 0:
                 limit = 100
@@ -96,24 +95,15 @@ if __name__ == '__main__':
             else:
                 limit = 4000
 
-            cluster_sizes, drift = load_drift(model_name, dataset, param[col], limit)
-            null_cluster_sizes, null_drift = load_drift("null_model", null_dataset, [density[col]], limit)
+            cluster_sizes, diffusion = load_diffusion(model_name, dataset, param[col], limit)
+            null_cluster_sizes, null_diffusion = load_diffusion("null_model", null_dataset, [density[col]], limit)
 
             if row == 0 and col == 0:
-                ax.plot(cluster_sizes, drift, "b-", label="Model")
-                ax.plot(null_cluster_sizes, null_drift, "0.7", label="Null model")
+                ax.plot(cluster_sizes, diffusion, "b-", label="Model")
+                ax.plot(null_cluster_sizes, null_diffusion, "0.7", label="Null model")
             else:
-                ax.plot(cluster_sizes, drift, "b-")
-                ax.plot(null_cluster_sizes, null_drift, "0.7")
-
-            if row == 2 and col == 1:
-                inset_cutoff = 200
-                ax_inset = ax.inset_axes([0.45, 0.1, 0.5, 0.5])
-                ax_inset.plot(cluster_sizes[:inset_cutoff], drift[:inset_cutoff], "b-")
-                ax_inset.plot(null_cluster_sizes[:inset_cutoff], null_drift[:inset_cutoff], "0.7")
-                ax_inset.axhline(y=0, linestyle="--", color="k")
-                ax_inset.set_xlim(0, inset_cutoff)
-                ax_inset.set_ylim(-0.5, 0.5)
+                ax.plot(cluster_sizes, diffusion, "b-")
+                ax.plot(null_cluster_sizes, null_diffusion, "0.7")
 
             if row == num_rows - 1:
                 ax.set_xlabel("cluster size s")
@@ -122,7 +112,7 @@ if __name__ == '__main__':
                 ax.set_xticks([])
                 
             if col == 0:
-                ax.set_ylabel("mean growth rate")
+                ax.set_ylabel("variance")
 
     fig.legend(["model", "null"], loc='upper right')
-    plt.savefig(f"./figures/fig3_{null_dataset}.png")
+    plt.savefig(f"./figures/fig4_{null_dataset}.png")
