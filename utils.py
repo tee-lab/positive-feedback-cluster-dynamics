@@ -62,5 +62,20 @@ def apply_periodic_boundary(labels):
     return labels
 
 
+def get_file_root(simulation_name, parameters):
+    if simulation_name == "tdp":
+        p = parameters[0]
+        q = parameters[1]
+        file_root = f"tdp_{str(p).replace('.', 'p')}_{str(q).replace('.', 'q')}"
+    elif simulation_name == "scanlon":
+        rainfall = parameters[0]
+        file_root = f"scanlon_{str(rainfall).replace('.', 'p')}"
+    elif simulation_name == "null_model":
+        f = parameters[0]
+        file_root = f"null_{str(f).replace('.', 'p')}"
+
+    return file_root
+
+
 if __name__ == '__main__':
     delete_files_in_dir("temp/")
