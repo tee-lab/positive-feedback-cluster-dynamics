@@ -67,15 +67,13 @@ if __name__ == '__main__':
     fig, axs = plt.subplots(nrows=num_rows, ncols=1, constrained_layout=True, figsize=(8.27, 8.27 * num_rows / num_cols + 2))
     fig.suptitle('Cluster Size Distribution')
 
-    # clear subplots
     for ax in axs:
         ax.remove()
 
-    # add subfigure per subplot
     gridspec = axs[0].get_subplotspec().get_gridspec()
     subfigs = [fig.add_subfigure(gs) for gs in gridspec]
 
-    for row, subfig in tqdm(enumerate(subfigs)):
+    for row, subfig in enumerate(tqdm(subfigs)):
         model_name = model_names[row]
         display_name = display_names[row]
         dataset = datasets[row]
@@ -102,10 +100,14 @@ if __name__ == '__main__':
                 ax.set_title(chr(65 + row) + str(col), loc="left")  
 
                 cluster_sizes, cluster_icdf = load_csd(model_name, dataset, param[col - 1])
-                ax.loglog(cluster_sizes, cluster_icdf, "b-", label="model")
-
                 null_cluste_sizes, null_cluster_icdf = load_csd("null_model", null_dataset, [density[col - 1]])
-                ax.loglog(null_cluste_sizes, null_cluster_icdf, "0.7", label="null")
+
+                if row == 1 and col == 1:
+                    ax.loglog(cluster_sizes, cluster_icdf, "b-", label="model")
+                    ax.loglog(null_cluste_sizes, null_cluster_icdf, "0.7", label="null")
+                else:
+                    ax.loglog(cluster_sizes, cluster_icdf, "b-")
+                    ax.loglog(null_cluste_sizes, null_cluster_icdf, "0.7")
 
                 ax.set_ylim(10 ** -4, 1)
                 if col == 1:
@@ -118,6 +120,5 @@ if __name__ == '__main__':
                 if row == num_rows - 1:
                     ax.set_xlabel("cluster size s")
             
-    handles, labels = ax.get_legend_handles_labels()
-    fig.legend(handles, labels, loc='upper right')
+    fig.legend(["model", "null"], loc='upper right')
     plt.savefig(f"./figures/fig1_{null_dataset}.png")
