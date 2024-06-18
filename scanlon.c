@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
     char file_root[200];
     strcpy(file_root, argv[3]);
 
-    int radius = 6;
+    int radius = 8;
     int immediacy = 24;
     float carrying_capacity = get_forest_cover(rainfall);
 
