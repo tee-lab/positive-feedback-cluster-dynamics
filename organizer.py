@@ -22,6 +22,15 @@ def organize(simulation_name, parameter_values):
             for output_file in listdir(output_path):
                 if output_file.startswith(prefix):
                     move(output_path + output_file, output_path + prefix)
+    elif simulation_name == "null":
+        for parameters in parameter_values:
+            f = parameters[0]
+            prefix = f"null_{str(f).replace('.', 'p')}"
+            makedirs(output_path + prefix, exist_ok=True)
+
+            for output_file in listdir(output_path):
+                if output_file.startswith(prefix):
+                    move(output_path + output_file, output_path + prefix)
 
 
 
@@ -46,5 +55,18 @@ if __name__ == '__main__':
     #     [770],
     #     [850]
     # ]
+
+    simulation_name = "null"
+    parameter_values = [
+        [0.25],
+        [0.26],
+        [0.27],
+        [0.45],
+        [0.48],
+        [0.49],
+        [0.53],
+        [0.54],
+        [0.56]
+    ]
 
     organize(simulation_name, parameter_values)
