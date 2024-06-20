@@ -1,4 +1,4 @@
-#define SIZE 100
+#define SIZE 256
 #define EQUILIBRATION 1000
 #define SIMULATION 1000
 
