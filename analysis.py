@@ -95,7 +95,7 @@ def cluster_sde(clusters_before, clusters_after, file_root):
     for cluster_size in tqdm(sorted(cluster_changes.keys())):
         changes = array(cluster_changes[cluster_size])
         drift = changes.mean()
-        diffusion = sum([(change - drift) ** 2 for change in changes]) / len(changes) - drift ** 2
+        diffusion = ((changes - drift) ** 2).mean()
 
         cluster_sizes.append(cluster_size)
         drifts.append(drift)
