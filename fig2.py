@@ -52,7 +52,7 @@ def load_cd(model_name, dataset, param):
 
 if __name__ == '__main__':
     base_path = f"./results"
-    null_dataset = "100x100_23"
+    null_dataset = "256x256_64"
 
     model_names = []
     display_names = []
@@ -64,27 +64,24 @@ if __name__ == '__main__':
 
     model_names.append("tdp")
     display_names.append("Low positive feedback")
-    datasets.append("100x100_23")
+    datasets.append("256x256_64")
     params.append([[0.65, 0], [0.7, 0], [0.72, 0]])
     variables.append("p")
     densities.append([0.27, 0.48, 0.54])
-    phase_diagram_files.append("q0_transitions.txt")
 
     model_names.append("tdp")
     display_names.append("Medium positive feedback")
-    datasets.append("100x100_23")
+    datasets.append("256x256_64")
     params.append([[0.51, 0.5], [0.535, 0.5], [0.55, 0.5]])
     variables.append("p")
     densities.append([0.25, 0.45, 0.53])
-    phase_diagram_files.append("q0p5_transitions.txt")
 
     model_names.append("scanlon")
     display_names.append("Extended positive feedback")
-    datasets.append("100x100_23_6_24")
+    datasets.append("256x256_64_8_24")
     params.append([[500], [770], [850]])
     variables.append("rainfall")
     densities.append([0.26, 0.49, 0.56])
-    phase_diagram_files.append("transitions.txt")
 
     num_rows = len(model_names)
     num_cols = 3
@@ -105,7 +102,6 @@ if __name__ == '__main__':
         param = params[row]
         variable = variables[row]
         density = densities[row]
-        phase_diagram_file = phase_diagram_files[row]
 
         subfig.suptitle(display_name, x=0.08, ha="left")
         axs = subfig.subplots(nrows=1, ncols=num_cols)
@@ -128,17 +124,30 @@ if __name__ == '__main__':
             if row == num_rows - 1:
                 ax.set_xlabel("change in cluster size $\Delta s$")
 
-            ax.set_ylim(1e-8, 1)
+            if null_dataset == "100x100_23":
+                ax.set_ylim(1e-8, 1)
+
+                if col == 0:
+                    ax.set_xlim(1, 10 ** 2.5)
+                elif col == 1:
+                    ax.set_xlim(1, 10 ** 3.5)
+                else:
+                    ax.set_xlim(1, 10 ** 4)
+
+            elif null_dataset == "256x256_64":
+                ax.set_ylim(1e-10, 1)
+
+                if col == 0:
+                    ax.set_xlim(1, 10 ** 3)
+                elif col == 1:
+                    ax.set_xlim(1, 10 ** 4)
+                else:
+                    ax.set_xlim(1, 10 ** 5.5)
+
             if col != 0:
                 ax.set_yticklabels([])
                 ax.set_yticks([])
-
-            if col == 0:
-                ax.set_xlim(1, 10 ** 2.5)
-            elif col == 1:
-                ax.set_xlim(1, 10 ** 3.5)
-            else:
-                ax.set_xlim(1, 10 ** 4)
+            
             if row != num_rows - 1:
                 ax.set_xticklabels([])
                 ax.set_xticks([])

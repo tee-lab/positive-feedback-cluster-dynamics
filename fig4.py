@@ -26,8 +26,12 @@ def load_diffusion(model_name, dataset, param, limit):
 
 if __name__ == '__main__':
     base_path = f"./results"
-    null_dataset = "100x100_23"
-    samples_cutoff = 5000
+    null_dataset = "256x256_64"
+
+    if null_dataset == "100x100_23":
+        samples_cutoff = 5000
+    elif null_dataset == "256x256_64":
+        samples_cutoff = 15000
 
     model_names = []
     display_names = []
@@ -35,31 +39,27 @@ if __name__ == '__main__':
     params = []
     variables = []
     densities = []
-    phase_diagram_files = []
 
     model_names.append("tdp")
     display_names.append("Low positive feedback")
-    datasets.append("100x100_23")
+    datasets.append("256x256_64")
     params.append([[0.65, 0], [0.7, 0], [0.72, 0]])
     variables.append("p")
     densities.append([0.27, 0.48, 0.54])
-    phase_diagram_files.append("q0_transitions.txt")
 
     model_names.append("tdp")
     display_names.append("Medium positive feedback")
-    datasets.append("100x100_23")
+    datasets.append("256x256_64")
     params.append([[0.51, 0.5], [0.535, 0.5], [0.55, 0.5]])
     variables.append("p")
     densities.append([0.25, 0.45, 0.53])
-    phase_diagram_files.append("q0p5_transitions.txt")
 
     model_names.append("scanlon")
     display_names.append("Extended positive feedback")
-    datasets.append("100x100_23_6_24")
+    datasets.append("256x256_64_8_24")
     params.append([[500], [770], [850]])
     variables.append("rainfall")
     densities.append([0.26, 0.49, 0.56])
-    phase_diagram_files.append("transitions.txt")
 
     num_rows = len(model_names)
     num_cols = 3
@@ -80,7 +80,6 @@ if __name__ == '__main__':
         param = params[row]
         variable = variables[row]
         density = densities[row]
-        phase_diagram_file = phase_diagram_files[row]
 
         subfig.suptitle(display_name, x=0.08, ha="left")
         axs = subfig.subplots(nrows=1, ncols=num_cols)
@@ -88,12 +87,20 @@ if __name__ == '__main__':
         for col, ax in enumerate(axs):
             ax.set_title(chr(65 + row) + str(col + 1), loc="left")
 
-            if col == 0:
-                limit = 100
-            elif col == 1:
-                limit = 1000
-            else:
-                limit = 4000
+            if null_dataset == "100x100_23":
+                if col == 0:
+                    limit = 100
+                elif col == 1:
+                    limit = 1000
+                else:
+                    limit = 4000
+            elif null_dataset == "256x256_64":
+                if col == 0:
+                    limit = 100
+                elif col == 1:
+                    limit = 1000
+                else:
+                    limit = 20000
 
             cluster_sizes, diffusion = load_diffusion(model_name, dataset, param[col], limit)
             null_cluster_sizes, null_diffusion = load_diffusion("null_model", null_dataset, [density[col]], limit)

@@ -28,7 +28,7 @@ def load_csd(model_name, dataset, param):
 
 if __name__ == '__main__':
     base_path = f"./results"
-    null_dataset = "100x100_23"
+    null_dataset = "256x256_64"
 
     model_names = []
     display_names = []
@@ -40,7 +40,7 @@ if __name__ == '__main__':
 
     model_names.append("tdp")
     display_names.append("Low positive feedback")
-    datasets.append("100x100_23")
+    datasets.append("256x256_64")
     params.append([[0.65, 0], [0.7, 0], [0.72, 0]])
     variables.append("p")
     densities.append([0.27, 0.48, 0.54])
@@ -48,7 +48,7 @@ if __name__ == '__main__':
 
     model_names.append("tdp")
     display_names.append("Medium positive feedback")
-    datasets.append("100x100_23")
+    datasets.append("256x256_64")
     params.append([[0.51, 0.5], [0.535, 0.5], [0.55, 0.5]])
     variables.append("p")
     densities.append([0.25, 0.45, 0.53])
@@ -56,7 +56,7 @@ if __name__ == '__main__':
 
     model_names.append("scanlon")
     display_names.append("Extended positive feedback")
-    datasets.append("100x100_23_6_24")
+    datasets.append("256x256_64_8_24")
     params.append([[500], [770], [850]])
     variables.append("rainfall")
     densities.append([0.26, 0.49, 0.56])
@@ -109,7 +109,11 @@ if __name__ == '__main__':
                     ax.loglog(cluster_sizes, cluster_icdf, "b-")
                     ax.loglog(null_cluste_sizes, null_cluster_icdf, "0.7")
 
-                ax.set_ylim(10 ** -4, 1)
+                if null_dataset == "100x100_23":
+                    ax.set_ylim(10 ** -4, 1)
+                elif null_dataset == "256x256_64":
+                    ax.set_ylim(10 ** -6, 1)
+
                 if col == 1:
                     ax.set_ylabel("$P(S \geq s)$")
                 else:
