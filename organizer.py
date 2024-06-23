@@ -51,6 +51,13 @@ if __name__ == '__main__':
     #     [0.55, 0.5]
     # ]
 
+    simulation_name = "tdp"
+    parameter_values = [
+        [0.585, 0.25],
+        [0.62, 0.25],
+        [0.645, 0.25]
+    ]
+
     # simulation_name = "scanlon"
     # parameter_values = [
     #     [500],
@@ -58,17 +65,17 @@ if __name__ == '__main__':
     #     [850]
     # ]
 
-    simulation_name = "null"
-    parameter_values = [
-        # [0.25],
-        # [0.26],
-        [0.27],
-        [0.45],
-        [0.48],
-        [0.49],
-        [0.53],
-        [0.54],
-        [0.56]
-    ]
+    # simulation_name = "null"
+    # parameter_values = [
+    #     [0.25],
+    #     [0.26],
+    #     [0.27],
+    #     [0.45],
+    #     [0.48],
+    #     [0.49],
+    #     [0.53],
+    #     [0.54],
+    #     [0.56]
+    # ]
 
     organize(simulation_name, parameter_values)

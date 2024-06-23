@@ -76,11 +76,17 @@ if __name__ == '__main__':
     #     [0.535, 0.5],
     #     [0.55, 0.5]
     # ]
+    # simulation_name = "tdp"
+    # parameter_values = [
+    #     [0.585, 0.25],
+    #     [0.62, 0.25],
+    #     [0.645, 0.25]
+    # ]
     simulation_name = "tdp"
     parameter_values = [
-        [0.585, 0.25],
-        [0.62, 0.25],
-        [0.645, 0.25]
+        [0.405, 0.75],
+        [0.41, 0.75],
+        [0.42, 0.75]
     ]
 
     # simulation_name = "scanlon"
