@@ -85,13 +85,24 @@ if __name__ == '__main__':
     #     [0.56]
     # ]
 
-    simulation_name = "null"
+    # simulation_name = "null"
+    # parameter_values = [
+    #     [0.24],
+    #     [0.44],
+    #     [0.23],
+    #     [0.38],
+    #     [0.52]
+    # ]
+
+    simulation_name = "tdp"
     parameter_values = [
-        [0.24],
-        [0.44],
-        [0.23],
-        [0.38],
-        [0.52]
+        [0.618, 0],
+        [0.62, 0],
+        [0.625, 0],
+        [0.63, 0],
+        [0.64, 0],
+        [0.68, 0],
+        [0.74, 0]
     ]
 
     organize(simulation_name, parameter_values)
