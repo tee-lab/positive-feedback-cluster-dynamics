@@ -27,6 +27,7 @@ def load_drift(model_name, dataset, param, limit):
 if __name__ == '__main__':
     base_path = f"./results"
     null_dataset = "256x256_64"
+    main_fig = False
 
     if null_dataset == "100x100_23":
         samples_cutoff = 5000
@@ -40,26 +41,41 @@ if __name__ == '__main__':
     variables = []
     densities = []
 
-    model_names.append("tdp")
-    display_names.append("Low positive feedback")
-    datasets.append("256x256_64")
-    params.append([[0.65, 0], [0.7, 0], [0.72, 0]])
-    variables.append("p")
-    densities.append([0.27, 0.48, 0.54])
+    if main_fig:
+        model_names.append("tdp")
+        display_names.append("Low positive feedback")
+        datasets.append("256x256_64")
+        params.append([[0.65, 0], [0.7, 0], [0.72, 0]])
+        variables.append("p")
+        densities.append([0.27, 0.48, 0.54])
 
-    model_names.append("tdp")
-    display_names.append("Medium positive feedback")
-    datasets.append("256x256_64")
-    params.append([[0.51, 0.5], [0.535, 0.5], [0.55, 0.5]])
-    variables.append("p")
-    densities.append([0.25, 0.45, 0.53])
+        model_names.append("tdp")
+        display_names.append("Medium positive feedback")
+        datasets.append("256x256_64")
+        params.append([[0.51, 0.5], [0.535, 0.5], [0.55, 0.5]])
+        variables.append("p")
+        densities.append([0.25, 0.45, 0.53])
 
-    model_names.append("scanlon")
-    display_names.append("Extended positive feedback")
-    datasets.append("256x256_64_8_24")
-    params.append([[500], [770], [850]])
-    variables.append("rainfall")
-    densities.append([0.26, 0.49, 0.56])
+        model_names.append("scanlon")
+        display_names.append("Extended positive feedback")
+        datasets.append("256x256_64_8_24")
+        params.append([[500], [770], [850]])
+        variables.append("rainfall")
+        densities.append([0.26, 0.49, 0.56])
+    else:
+        model_names.append("tdp")
+        display_names.append("TDP (q = 0.25)")
+        datasets.append("256x256_64")
+        params.append([[0.585, 0.25], [0.62, 0.25], [0.645, 0.25]])
+        variables.append("p")
+        densities.append([0.24, 0.45, 0.52])
+
+        model_names.append("tdp")
+        display_names.append("TDP (q = 0.75)")
+        datasets.append("256x256_64")
+        params.append([[0.405, 0.75], [0.41, 0.75], [0.42, 0.75]])
+        variables.append("p")
+        densities.append([0.24, 0.38, 0.52])
 
     num_rows = len(model_names)
     num_cols = 3
@@ -133,5 +149,10 @@ if __name__ == '__main__':
             if col == 0:
                 ax.set_ylabel("mean growth rate")
 
+    if main_fig:
+        fig_name = f"./figures/fig3_{null_dataset}.png"
+    else:
+        fig_name = f"./figures/fig3_{null_dataset}_appendix.png"
+
     fig.legend(["model", "null"], loc='upper right')
-    plt.savefig(f"./figures/fig3_{null_dataset}.png")
+    plt.savefig(fig_name)
