@@ -105,8 +105,11 @@ fit_tpl = TRUE
 # options(spatialwarnings.constants.reltol = 1e-4)
 
 # p_values = c("0p618")
-p_values = c("0p618", "0p62", "0p625", "0p63", "0p64", "0p65", "0p68", "0p7", "0p72", "0p74")
-q_value = "0"
+# p_values = c("0p618", "0p62", "0p625", "0p63", "0p64", "0p65", "0p68", "0p7", "0p72", "0p74")
+# q_value = "0"
+
+p_values = c("0p5", "0p505", "0p51", "0p52", "0p53", "0p535", "0p54", "0p55", "0p56")
+q_value = "0q5"
 
 # rainfall_values = c("300", "400", "500", "600", "700", "770", "800" ,"830", "850", "900")
 
