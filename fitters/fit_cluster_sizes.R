@@ -9,8 +9,11 @@ dataset = "256x256_64"
 options(spatialwarnings.constants.reltol = 1e-8)
 options(spatialwarnings.constants.maxit = 1e8)
 
-p_values = c("0p618", "0p62", "0p625", "0p63", "0p64", "0p65", "0p68", "0p7", "0p72", "0p74")
-q_value = "0"
+# p_values = c("0p618", "0p62", "0p625", "0p63", "0p64", "0p65", "0p68", "0p7", "0p72", "0p74")
+# q_value = "0"
+
+p_values = c("0p5", "0p505", "0p51", "0p52", "0p53", "0p535", "0p54", "0p55", "0p56")
+q_value = "0q5"
 
 root_path = file.path(results_path, model, dataset)
 data_frame = data.frame()
