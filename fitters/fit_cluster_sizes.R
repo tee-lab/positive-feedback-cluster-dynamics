@@ -2,9 +2,12 @@ library(reticulate)
 library(spatialwarnings)
 
 results_path = "C://Code//Github//positive-feedback-cluster-dynamics//results"
-# model = "tricritical"
-model = "tdp"
-dataset = "256x256_64"
+
+# model = "tdp"
+model = "scanlon"
+
+# dataset = "256x256_64"
+dataset = "256x256_64_8_24"
 
 options(spatialwarnings.constants.reltol = 1e-8)
 options(spatialwarnings.constants.maxit = 1e8)
@@ -12,13 +15,14 @@ options(spatialwarnings.constants.maxit = 1e8)
 # p_values = c("0p618", "0p62", "0p625", "0p63", "0p64", "0p65", "0p68", "0p7", "0p72", "0p74")
 # q_value = "0"
 
-p_values = c("0p5", "0p505", "0p51", "0p52", "0p53", "0p535", "0p54", "0p55", "0p56")
-q_value = "0q5"
+# p_values = c("0p5", "0p505", "0p51", "0p52", "0p53", "0p535", "0p54", "0p55", "0p56")
+# q_value = "0q5"
 
 root_path = file.path(results_path, model, dataset)
 data_frame = data.frame()
 
-# rainfall_values = c("300", "400", "500", "600", "700", "770", "830", "850", "900")
+rainfall_values = c("300", "400", "500", "600", "770")
+# rainfall_values = c("300", "400", "500", "600", "700", "770", "800", "830", "850", "900")
 
 if (model == "tdp") {
   values = p_values
@@ -31,7 +35,13 @@ root_path = file.path(results_path, model, dataset)
 for (p in values) {
   print(paste("<--- Analyzing", p, "--->"))
   
-  folder_name = paste(model, p, q_value, sep="_")
+  if (model == "tdp") {
+    folder_name = paste(model, p, q_value, sep="_")
+  }
+  else {
+    folder_name = paste(model, p, sep="_")
+  }
+  
   file_name = paste(folder_name, "lattices.pkl", sep="_")
   file_path = file.path(root_path, folder_name, file_name)
   source_python("lattice_parser.py")
@@ -42,7 +52,7 @@ for (p in values) {
   
   psd_plot = plot_distr(psd_object, best_only = FALSE)
   
-  if (model == "tricritical") {
+  if (model == "tdp") {
     png(filename=paste(p, "_", q_folder, ".png", sep = ""))
   } else {
     png(filename=paste(p, ".png", sep = ""))
