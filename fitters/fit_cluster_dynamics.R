@@ -115,7 +115,8 @@ fit_tpl = TRUE
 # p_values = c("0p5", "0p505", "0p51", "0p52", "0p53", "0p535", "0p54", "0p55", "0p56")
 # q_value = "0q5"
 
-rainfall_values = c("300", "400", "500", "600", "700", "770", "800" , "850", "900")
+rainfall_values = c("300")
+# rainfall_values = c("300", "400", "500", "600", "700", "770", "800" , "850", "900")
 
 if (model == "tdp") {
   values = p_values
