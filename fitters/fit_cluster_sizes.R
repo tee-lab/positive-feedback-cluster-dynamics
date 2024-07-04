@@ -21,8 +21,7 @@ options(spatialwarnings.constants.maxit = 1e8)
 root_path = file.path(results_path, model, dataset)
 data_frame = data.frame()
 
-rainfall_values = c("300", "400", "500", "600", "770")
-# rainfall_values = c("300", "400", "500", "600", "700", "770", "800", "830", "850", "900")
+rainfall_values = c("300", "400", "500", "600", "700", "770", "800", "850", "900")
 
 if (model == "tdp") {
   values = p_values

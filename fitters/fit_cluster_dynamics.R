@@ -115,7 +115,7 @@ fit_tpl = TRUE
 # p_values = c("0p5", "0p505", "0p51", "0p52", "0p53", "0p535", "0p54", "0p55", "0p56")
 # q_value = "0q5"
 
-rainfall_values = c("300", "400", "500", "600", "700", "770", "800" ,"830", "850", "900")
+rainfall_values = c("300", "400", "500", "600", "700", "770", "800" , "850", "900")
 
 if (model == "tdp") {
   values = p_values
@@ -182,7 +182,6 @@ for (p in values) {
     ggsave(filename=paste("..//outputs//", p, "_icdf.png", sep=""))
   }
   
-  
   # Show probability distribution
   ggplot(NULL) +
     geom_point(aes(x = dS, y = p),
@@ -192,8 +191,9 @@ for (p in values) {
     scale_y_continuous(trans = "log10") +
     scale_x_continuous(trans = "log10") +
     labs(x = "dS", y = "P(x=dS)")
+  
   if (model == "tdp") {
-    ggsave(filename=paste("..//outputs//", folder_name, "_", p, "_pdf.png", sep=""))
+    ggsave(filename=paste("..//outputs//", folder_name, "_pdf.png", sep=""))
   } else {
     ggsave(filename=paste("..//outputs//", p, "_pdf.png", sep=""))
   }
