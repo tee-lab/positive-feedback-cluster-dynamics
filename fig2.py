@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+from matplotlib.lines import Line2D
 from numpy import array, delete, loadtxt, transpose, zeros
 from utils import get_file_root
 from tqdm import tqdm
@@ -167,10 +168,14 @@ if __name__ == '__main__':
                 ax.set_xticklabels([])
                 ax.set_xticks([])
 
+            if row == 0 and col == num_cols - 1:
+                blue_line = Line2D([0], [0], color="blue", label="model")
+                grey_line = Line2D([0], [0], color="0.7", label="null")
+                ax.legend(handles=[blue_line, grey_line])
+
     if main_fig:
         fig_name = f"./figures/fig2_{null_dataset}.png"
     else:
         fig_name = f"./figures/fig2_{null_dataset}_appendix.png"
 
-    fig.legend(["model", "null"], loc='upper right')
     plt.savefig(fig_name)

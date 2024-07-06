@@ -1,4 +1,5 @@
 from matplotlib import pyplot as plt
+from matplotlib.lines import Line2D
 from numpy import delete, loadtxt, transpose, zeros
 from utils import get_file_root
 from tqdm import tqdm
@@ -105,7 +106,7 @@ if __name__ == '__main__':
         for col, ax in enumerate(axs):
             if col == 0:
                 phase_diagram = transpose(loadtxt(f"{base_path}/{model_name}/{phase_diagram_file}"))
-                ax.plot(phase_diagram[0], phase_diagram[1], "k-")
+                ax.plot(phase_diagram[0], phase_diagram[1], "b-")
                 ax.set_title(chr(65 + row), loc="left")
                 ax.set_xlabel(variable)
                 ax.set_ylabel("density")
@@ -141,11 +142,15 @@ if __name__ == '__main__':
 
                 if row == num_rows - 1:
                     ax.set_xlabel("cluster size s")
+
+                if row == 0 and col == num_cols - 1:
+                    blue_line = Line2D([0], [0], color="blue", label="model")
+                    grey_line = Line2D([0], [0], color="0.7", label="null")
+                    ax.legend(handles=[blue_line, grey_line])
             
     if main_fig:
         fig_name = f"./figures/fig1_{null_dataset}.png"
     else:
         fig_name = f"./figures/fig1_{null_dataset}_appendix.png"
 
-    fig.legend(["model", "null"], loc='upper right')
-    plt.savefig(fig_name)
+    plt.savefig(fig_name, bbox_inches="tight")
