@@ -82,15 +82,10 @@ for (p in values) {
   data_frame = rbind(data_frame, c(p_float, pl_bic, tpl_bic, exp_bic, pl_expo, exp_trunc, tpl_expo, tpl_trunc))
 }
 
-if (model == "tdp") {
-  colnames(data_frame)[1] = "p"
-} else {
-  colnames(data_frame)[1] = "rainfall"
-}
-
-colnames(data_frame)[2] = "PL"
-colnames(data_frame)[3] = "TPL"
-colnames(data_frame)[4] = "Exp"
+colnames(data_frame)[1] = "p"
+colnames(data_frame)[2] = "PL BIC"
+colnames(data_frame)[3] = "TPL BIC"
+colnames(data_frame)[4] = "Exp BIC"
 colnames(data_frame)[5] = "PL expo"
 colnames(data_frame)[6] = "Exp trunc"
 colnames(data_frame)[7] = "TPL expo"
@@ -99,7 +94,7 @@ colnames(data_frame)[8] = "TPL trunc"
 data_frame[is.na(data_frame)] = 0
 
 if (model == "tdp") {
-  write.csv(data_frame, paste(q_value, "_tdp_csd", ".csv", sep=""))
+  write.csv(data_frame, paste(q_value, "_csd", ".csv", sep=""))
 } else {
   write.csv(data_frame, paste("scanlon_csd", ".csv", sep=""))
 }
