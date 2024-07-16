@@ -98,11 +98,11 @@ library(spatialwarnings)
 
 results_path <- "..//results"
 
-# model = "tdp"
-model = "scanlon"
+model = "tdp"
+# model = "scanlon"
 
-# dataset = "256x256_64"
-dataset = "256x256_64_8_24"
+dataset = "256x256_64"
+# dataset = "256x256_64_8_24"
 
 fit_tpl = TRUE
 
@@ -115,7 +115,10 @@ fit_tpl = TRUE
 # p_values = c("0p5", "0p505", "0p51", "0p52", "0p53", "0p535", "0p54", "0p55", "0p56")
 # q_value = "0q5"
 
-rainfall_values = c("300")
+p_values = c("0p282", "0p2825", "0p283", "0p2835", "0p284", "0p2845", "0p285")
+q_value = "0q92"
+
+# rainfall_values = c("300")
 # rainfall_values = c("300", "400", "500", "600", "700", "770", "800" , "850", "900")
 
 if (model == "tdp") {
