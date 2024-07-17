@@ -1,4 +1,4 @@
-# DIFFUSION
+# ABRUPT PROCESSES
 
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
@@ -7,35 +7,36 @@ from tqdm import tqdm
 from utils import get_file_root
 
 
-def load_diffusion(model_name, dataset, param, limit):
+def load_processes(model_name, dataset, param):
     file_root = get_file_root(model_name, param)
     file_name = f"{base_path}/{model_name}/{dataset}/{file_root}/{file_root}_sde.txt"
     data = transpose(loadtxt(file_name, dtype=float))
-    cluster_sizes, diffusion, num_samples = data[0], data[2], data[3]
+    num_samples = data[3][:]
 
-    if model_name != "null_model":
-        return cluster_sizes[:limit], diffusion[:limit]
-    else:
-        limit = -1
-        for i in range(len(cluster_sizes)):
-            if num_samples[i] < samples_cutoff:
-                limit = i
-                break
-        if limit == -1:
-            limit = 10
+    file_name = f"{base_path}/{model_name}/{dataset}/{file_root}/{file_root}_processes.txt"
+    data = transpose(loadtxt(file_name, dtype=float))
+    cluster_sizes, growth, decay, merge, split = data
 
-        return cluster_sizes[:limit], diffusion[:limit]
+    limit = -1
+    for i in range(len(cluster_sizes)):
+        if num_samples[i] < samples_cutoff:
+            limit = i
+            break
+    if limit == -1:
+        limit = 10
+
+    return cluster_sizes[:limit], growth[:limit], decay[:limit], merge[:limit], split[:limit]
 
 
 if __name__ == '__main__':
     base_path = f"./results"
     null_dataset = "256x256_64"
-    main_fig = False
+    main_fig = True
 
     if null_dataset == "100x100_23":
         samples_cutoff = 5000
     elif null_dataset == "256x256_64":
-        samples_cutoff = 15000
+        samples_cutoff = 1000
 
     model_names = []
     display_names = []
@@ -83,7 +84,7 @@ if __name__ == '__main__':
     num_rows = len(model_names)
     num_cols = 3
     fig, axs = plt.subplots(nrows=num_rows, ncols=1, constrained_layout=True, figsize=(8.27, 8.27 * num_rows / num_cols + 2))
-    fig.suptitle('Variance in Growth Rate of Clusters')
+    fig.suptitle('Number of Processes')
 
     # clear subplots
     for ax in axs:
@@ -106,30 +107,19 @@ if __name__ == '__main__':
         for col, ax in enumerate(axs):
             ax.set_title(chr(65 + row) + str(col + 1), loc="left")
 
-            if null_dataset == "100x100_23":
-                if col == 0:
-                    limit = 100
-                elif col == 1:
-                    limit = 1000
-                else:
-                    limit = 4000
-            elif null_dataset == "256x256_64":
-                if col == 0:
-                    limit = 100
-                elif col == 1:
-                    limit = 1000
-                else:
-                    limit = 20000
+            cluster_sizes, growth, decay, merge, split = load_processes(model_name, dataset, param[col])
+            # null_cluster_sizes, null_merge, null_split = load_drift("null_model", null_dataset, [density[col]], 100)
 
-            cluster_sizes, diffusion = load_diffusion(model_name, dataset, param[col], limit)
-            null_cluster_sizes, null_diffusion = load_diffusion("null_model", null_dataset, [density[col]], limit)
+            ax.loglog(cluster_sizes, merge, "b-")
+            ax.loglog(cluster_sizes, split, "r-")
+            ax.loglog(cluster_sizes, growth, "b--")
+            ax.loglog(cluster_sizes, decay, "r--")
 
-            if row == 0 and col == 0:
-                ax.plot(cluster_sizes, diffusion, "b-", label="Model")
-                ax.plot(null_cluster_sizes, null_diffusion, "0.7", label="Null model")
-            else:
-                ax.plot(cluster_sizes, diffusion, "b-")
-                ax.plot(null_cluster_sizes, null_diffusion, "0.7")
+            ax_inset = ax.inset_axes([0.2, 0.1, 0.4, 0.4])
+            ax_inset.semilogy(cluster_sizes, merge, "b-")
+            ax_inset.semilogy(cluster_sizes, split, "r-")
+            ax_inset.semilogy(cluster_sizes, growth, "b--")
+            ax_inset.semilogy(cluster_sizes, decay, "r--")
 
             if row == num_rows - 1:
                 ax.set_xlabel("cluster size s")
@@ -138,16 +128,11 @@ if __name__ == '__main__':
                 ax.set_xticks([])
                 
             if col == 0:
-                ax.set_ylabel("variance")
-
-            if row == 0 and col == num_cols - 1:
-                blue_line = Line2D([0], [0], color="blue", label="model")
-                grey_line = Line2D([0], [0], color="0.7", label="null")
-                ax.legend(handles=[blue_line, grey_line])
+                ax.set_ylabel("Number of processes")
 
     if main_fig:
-        fig_name = f"./figures/fig4_{null_dataset}.png"
+        fig_name = f"./figures/fig7_{null_dataset}.png"
     else:
-        fig_name = f"./figures/fig4_{null_dataset}_appendix.png"
+        fig_name = f"./figures/fig7_{null_dataset}_appendix.png"
 
-    plt.savefig(fig_name)
+    plt.savefig(fig_name, bbox_inches="tight")

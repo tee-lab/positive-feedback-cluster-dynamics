@@ -146,10 +146,10 @@ def plot_sde(data_path, file_root):
     plt.title("Number of processes undergone by clusters of different sizes")
     plt.xlabel("Cluster Size s")
     plt.ylabel("Number of Processes")
-    plt.plot(cluster_sizes[:index_cutoff], num_growths[:index_cutoff], label="Growth")
-    plt.plot(cluster_sizes[:index_cutoff], num_decays[:index_cutoff], label="Decay")
-    plt.plot(cluster_sizes[:index_cutoff], num_merges[:index_cutoff], label="Merge")
-    plt.plot(cluster_sizes[:index_cutoff], num_splits[:index_cutoff], label="Split")
+    plt.loglog(cluster_sizes[:index_cutoff], num_growths[:index_cutoff], label="Growth")
+    plt.loglog(cluster_sizes[:index_cutoff], num_decays[:index_cutoff], label="Decay")
+    plt.loglog(cluster_sizes[:index_cutoff], num_merges[:index_cutoff], label="Merge")
+    plt.loglog(cluster_sizes[:index_cutoff], num_splits[:index_cutoff], label="Split")
     plt.legend()
     plt.savefig(data_path + file_root + "processes.png")
     plt.show()
@@ -237,14 +237,22 @@ def grapher(simulation_name, parameters, data_path = "outputs/"):
 
 if __name__ == '__main__':
     simulation_name = "tdp"
-    dataset = "100x100_23"
-    parameters = [0.7, 0]
-    base_path = f"results/{simulation_name}/{dataset}/"
+    dataset = "256x256_64"
+    parameters = [0.2845, 0.92]
 
+    # simulation_name = "scanlon"
+    # dataset = "256x256_64_8_24"
+    # parameters = [500]
+
+    base_path = f"results/{simulation_name}/{dataset}/"
     if simulation_name == "tdp":
         p = str(parameters[0]).replace('.', 'p')
         q = str(parameters[1]).replace('.', 'q')
         simulation_folder = f"tdp_{p}_{q}"
         base_path += f"{simulation_folder}/"
+    elif simulation_name == "scanlon":
+        rainfall = str(parameters[0]).replace('.', 'p')
+        simulation_folder = f"scanlon_{rainfall}"
+        base_path += f"{simulation_folder}/"
 
-    grapher(simulation_name, parameters)
+    grapher(simulation_name, parameters, base_path)

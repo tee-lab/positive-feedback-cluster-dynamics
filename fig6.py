@@ -1,46 +1,45 @@
-# RESIDUES
+# ABRUPT PROCESSES
 
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
-from numpy import array
+from numpy import loadtxt, transpose
 from tqdm import tqdm
 from utils import get_file_root
 
 
-def load_residues(model_name, dataset, param, cluster_size_req):
+def load_abrupt(model_name, dataset, param, limit):
     file_root = get_file_root(model_name, param)
-    file_name = f"{base_path}/{model_name}/{dataset}/{file_root}/{file_root}_residues.txt"
-    fp = open(file_name, "r")
-    lines = fp.read().split("\n")
+    file_name = f"{base_path}/{model_name}/{dataset}/{file_root}/{file_root}_sde.txt"
+    data = transpose(loadtxt(file_name, dtype=float))
+    num_samples = data[3][:]
 
-    for line in lines[:-1]:
-        section1, section2, section3 = line.split(" : ")
-        cluster_size = int(section1)
+    file_name = f"{base_path}/{model_name}/{dataset}/{file_root}/{file_root}_abrupt.txt"
+    data = transpose(loadtxt(file_name, dtype=float))
+    cluster_sizes, merge, split = data[0], data[1], data[2]
 
-        if cluster_size == cluster_size_req:
-            bins = list(map(int, section2.split(", ")))
-            freqs = array(list(map(int, section3.split(", "))))
-            bin_range = list(range(bins[0], bins[1]))
+    if model_name != "null_model":
+        return cluster_sizes[:limit], merge[:limit], split[:limit]
+    else:
+        limit = -1
+        for i in range(len(cluster_sizes)):
+            if num_samples[i] < samples_cutoff:
+                limit = i
+                break
+        if limit == -1:
+            limit = 10
 
-            zero_index = -1
-            for i in range(len(bin_range)):
-                if bin_range[i] == 0:
-                    zero_index = i
-                    break
-
-            bin_range = bin_range[zero_index:]
-            freqs = freqs[zero_index:] / sum(freqs[zero_index:])
-
-            return bin_range, freqs
-        
-    return None
+        return cluster_sizes[:limit], merge[:limit], split[:limit]
 
 
 if __name__ == '__main__':
     base_path = f"./results"
     null_dataset = "256x256_64"
-    cluster_size = 100
-    main_fig = False
+    main_fig =True
+
+    if null_dataset == "100x100_23":
+        samples_cutoff = 5000
+    elif null_dataset == "256x256_64":
+        samples_cutoff = 15000
 
     model_names = []
     display_names = []
@@ -88,7 +87,7 @@ if __name__ == '__main__':
     num_rows = len(model_names)
     num_cols = 3
     fig, axs = plt.subplots(nrows=num_rows, ncols=1, constrained_layout=True, figsize=(8.27, 8.27 * num_rows / num_cols + 2))
-    fig.suptitle(f'Distribution of residues for cluster size {cluster_size}')
+    fig.suptitle('Average Change associated with Abrupt Processes')
 
     # clear subplots
     for ax in axs:
@@ -111,49 +110,38 @@ if __name__ == '__main__':
         for col, ax in enumerate(axs):
             ax.set_title(chr(65 + row) + str(col + 1), loc="left")
 
-            residues, freqs = load_residues(model_name, dataset, param[col], cluster_size)
-            null_result = load_residues("null_model", null_dataset, [density[col]], cluster_size)
+            if col == 0:
+                limit = 250
+            elif col == 1:
+                limit = 4000
+            elif col == 2:
+                limit = 8000
 
-            if row == 0 and col == 0:
-                ax.loglog(residues, freqs, "bo", label="Model")
-                if null_result is not None:
-                    null_residues, null_freqs = null_result
-                    ax.loglog(null_residues, null_freqs, "ko", label="Null model")
-            else:
-                ax.loglog(residues, freqs, "bo")
-                if null_result is not None:
-                    null_residues, null_freqs = null_result
-                    ax.loglog(null_residues, null_freqs, "ko")
+            cluster_sizes, merge, split = load_abrupt(model_name, dataset, param[col], limit)
+            # null_cluster_sizes, null_merge, null_split = load_drift("null_model", null_dataset, [density[col]], 100)
+
+            ax.plot(cluster_sizes, merge, "b-")
+            ax.plot(cluster_sizes, -split, "r-")
+            # ax.plot(null_cluster_sizes, null_merge, "b--")
+            # ax.plot(null_cluster_sizes, -null_split, "r--")
 
             if row == num_rows - 1:
-                ax.set_xlabel("residues")
-            if col == 0:
-                ax.set_ylabel("fraction")
-
-            ax.set_ylim(10 ** -7, 1)
-            if col != 0:
-                ax.set_yticklabels([])
-                ax.set_yticks([])
-
-            if cluster_size == 10:
-                ax.set_xlim(1, 10 ** 1.5)
-            elif cluster_size == 50:
-                ax.set_xlim(1, 10 ** 2)
-            elif cluster_size == 100:
-                ax.set_xlim(1, 10 ** 2.5)
-
-            if row != num_rows - 1:
+                ax.set_xlabel("cluster size s")
+            else:
                 ax.set_xticklabels([])
                 ax.set_xticks([])
+                
+            if col == 0:
+                ax.set_ylabel("Average change")
 
             if row == 0 and col == num_cols - 1:
-                blue_dot = Line2D([0], [0], color="blue", marker="o", linestyle="", label="model")
-                black_dot = Line2D([0], [0], color="black", marker="o", linestyle="", label="null")
-                ax.legend(handles=[blue_dot, black_dot])
+                blue_line = Line2D([0], [0], color="blue", label="model")
+                red_line = Line2D([0], [0], color="red", label="model")
+                ax.legend(handles=[blue_line, red_line])
 
     if main_fig:
-        fig_name = f"./figures/fig5_{null_dataset}_{cluster_size}.png"
+        fig_name = f"./figures/fig6_{null_dataset}.png"
     else:
-        fig_name = f"./figures/fig5_{null_dataset}_{cluster_size}_appendix.png"
+        fig_name = f"./figures/fig6_{null_dataset}_appendix.png"
 
-    plt.savefig(fig_name)
+    plt.savefig(fig_name, bbox_inches="tight")

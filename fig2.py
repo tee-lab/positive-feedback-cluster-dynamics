@@ -1,3 +1,5 @@
+# CLUSTER DYNAMICS
+
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
 from numpy import array, delete, loadtxt, transpose, zeros
