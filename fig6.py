@@ -7,7 +7,7 @@ from tqdm import tqdm
 from utils import get_file_root
 
 
-def load_abrupt(model_name, dataset, param, limit):
+def load_abrupt(model_name, dataset, param):
     file_root = get_file_root(model_name, param)
     file_name = f"{base_path}/{model_name}/{dataset}/{file_root}/{file_root}_sde.txt"
     data = transpose(loadtxt(file_name, dtype=float))
@@ -17,18 +17,15 @@ def load_abrupt(model_name, dataset, param, limit):
     data = transpose(loadtxt(file_name, dtype=float))
     cluster_sizes, merge, split = data[0], data[1], data[2]
 
-    if model_name != "null_model":
-        return cluster_sizes[:limit], merge[:limit], split[:limit]
-    else:
-        limit = -1
-        for i in range(len(cluster_sizes)):
-            if num_samples[i] < samples_cutoff:
-                limit = i
-                break
-        if limit == -1:
-            limit = 10
+    limit = -1
+    for i in range(len(cluster_sizes)):
+        if num_samples[i] < samples_cutoff:
+            limit = i
+            break
+    if limit == -1:
+        limit = 10
 
-        return cluster_sizes[:limit], merge[:limit], split[:limit]
+    return cluster_sizes[:limit], merge[:limit], split[:limit]
 
 
 if __name__ == '__main__':
@@ -39,7 +36,7 @@ if __name__ == '__main__':
     if null_dataset == "100x100_23":
         samples_cutoff = 5000
     elif null_dataset == "256x256_64":
-        samples_cutoff = 15000
+        samples_cutoff = 1000
 
     model_names = []
     display_names = []
@@ -109,34 +106,19 @@ if __name__ == '__main__':
 
         for col, ax in enumerate(axs):
             ax.set_title(chr(65 + row) + str(col + 1), loc="left")
-
-            if col == 0:
-                limit = 250
-            elif col == 1:
-                limit = 4000
-            elif col == 2:
-                limit = 8000
-
-            cluster_sizes, merge, split = load_abrupt(model_name, dataset, param[col], limit)
-            # null_cluster_sizes, null_merge, null_split = load_drift("null_model", null_dataset, [density[col]], 100)
-
+            cluster_sizes, merge, split = load_abrupt(model_name, dataset, param[col])
             ax.plot(cluster_sizes, merge, "b-")
             ax.plot(cluster_sizes, -split, "r-")
-            # ax.plot(null_cluster_sizes, null_merge, "b--")
-            # ax.plot(null_cluster_sizes, -null_split, "r--")
 
             if row == num_rows - 1:
                 ax.set_xlabel("cluster size s")
-            else:
-                ax.set_xticklabels([])
-                ax.set_xticks([])
                 
             if col == 0:
                 ax.set_ylabel("Average change")
 
             if row == 0 and col == num_cols - 1:
-                blue_line = Line2D([0], [0], color="blue", label="model")
-                red_line = Line2D([0], [0], color="red", label="model")
+                blue_line = Line2D([0], [0], color="blue", label="merge")
+                red_line = Line2D([0], [0], color="red", label="split")
                 ax.legend(handles=[blue_line, red_line])
 
     if main_fig:

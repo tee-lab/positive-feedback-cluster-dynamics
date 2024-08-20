@@ -31,7 +31,7 @@ def load_processes(model_name, dataset, param):
 if __name__ == '__main__':
     base_path = f"./results"
     null_dataset = "256x256_64"
-    main_fig = True
+    main_fig = False
 
     if null_dataset == "100x100_23":
         samples_cutoff = 5000
@@ -81,6 +81,12 @@ if __name__ == '__main__':
         variables.append("p")
         densities.append([0.24, 0.38, 0.52])
 
+        model_names.append("tdp")
+        display_names.append("TDP (q = 0.92)")
+        datasets.append("256x256_64")
+        params.append([[0.282, 0.92], [0.283, 0.92], [0.2845, 0.92]])
+        variables.append("p")
+
     num_rows = len(model_names)
     num_cols = 3
     fig, axs = plt.subplots(nrows=num_rows, ncols=1, constrained_layout=True, figsize=(8.27, 8.27 * num_rows / num_cols + 2))
@@ -99,7 +105,6 @@ if __name__ == '__main__':
         dataset = datasets[row]
         param = params[row]
         variable = variables[row]
-        density = densities[row]
 
         subfig.suptitle(display_name, x=0.08, ha="left")
         axs = subfig.subplots(nrows=1, ncols=num_cols)
@@ -126,9 +131,23 @@ if __name__ == '__main__':
             else:
                 ax.set_xticklabels([])
                 ax.set_xticks([])
+
+            if col == 0:
+                ax.set_xlim(1, 10 ** 3)
+            elif col == 1:
+                ax.set_xlim(1, 10 ** 4)
+            else:
+                ax.set_xlim(1, 10 ** 4.5)
                 
             if col == 0:
-                ax.set_ylabel("Number of processes")
+                ax.set_ylabel("Frequency")
+
+            if row == 0 and col == num_cols - 1:
+                blue_line = Line2D([0], [0], color="blue", label="merge")
+                red_line = Line2D([0], [0], color="red", label="split")
+                blue_dotted_line = Line2D([0], [0], color="blue", linestyle='--', label="growth")
+                red_dotted_line = Line2D([0], [0], color="red", linestyle='--', label="decay")
+                ax.legend(handles=[blue_line, red_line, blue_dotted_line, red_dotted_line])
 
     if main_fig:
         fig_name = f"./figures/fig7_{null_dataset}.png"
