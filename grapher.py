@@ -176,6 +176,10 @@ def plot_sde(data_path, file_root):
     for line in lines[:-1]:
         section1, section2, section3 = line.split(" : ")
         cluster_size = int(section1)
+
+        if cluster_size not in [10, 30, 50, 100, 200, 500]:
+            continue
+        
         bins = list(map(int, section2.split(", ")))
         freqs = list(map(int, section3.split(", ")))
 
