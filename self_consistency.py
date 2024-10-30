@@ -22,23 +22,26 @@ def random_from_residue(residue):
     for i in range(len(dist)):
         cumsum  += dist[i]
         if r < cumsum:
-            return i + residue["min_bin"]
+            return i + residue["min_bin"] + 1
         
     return len(dist) + residue["min_bin"]
 
 
-def init_csd_from_random_null(size = 256):
-    lattice = zeros((size, size))
-
-    for i in range(size):
-        for j in range(size):
-            if random() < 0.5:
-                lattice[i, j] = 1
-
-    labelled_lattice = label(lattice, background=0, connectivity=1)
+def init_csd_from_random_null(size = 256, ensembles = 64):
     cluster_sizes = []
-    for i in range(1, labelled_lattice.max() + 1):
-        cluster_sizes.append(sum(sum(labelled_lattice == i)))
+
+    for _ in range(ensembles):
+        lattice = zeros((size, size))
+
+        for i in range(size):
+            for j in range(size):
+                if random() < 0.5:
+                    lattice[i, j] = 1
+
+        labelled_lattice = label(lattice, background=0, connectivity=1)
+        
+        for i in range(1, labelled_lattice.max() + 1):
+            cluster_sizes.append(sum(sum(labelled_lattice == i)))
 
     return cluster_sizes
 
@@ -83,20 +86,23 @@ def self_consistency(simulation_name, parameters, data_path):
     popt, _ = curve_fit(specific_fit, cluster_sizes, drift)
     a_fit, b_fit = popt
     fit_curve = specific_fit(cluster_sizes, a_fit, b_fit)
-    
-    plt.axhline(0, color='k', linestyle='--')
-    plt.plot(cluster_sizes, drift, 'b.', label="drift data")
-    plt.plot(cluster_sizes, fit_curve, 'r-', label=f"fit: y = {a_fit:.3f} sqrt(x) + {b_fit:.3f} x")
-    plt.legend()
-    plt.show()
 
     # fitting diffusion
     m_fit = fit_linear_through_origin(cluster_sizes, diffusion)
     fit_line = m_fit * cluster_sizes
+
+    plt.subplots(2, 2, figsize=(10, 5))
+    plt.subplot(1, 2, 1)
+    plt.axhline(0, color='k', linestyle='--')
+    plt.plot(cluster_sizes, drift, 'b.', label="drift data")
+    plt.plot(cluster_sizes, fit_curve, 'r-', label=f"fit: y = {a_fit:.3f} sqrt(x) + {b_fit:.3f} x")
+    plt.legend()
     
+    plt.subplot(1, 2, 2)
     plt.plot(cluster_sizes, diffusion, 'b.', label="diffusion data")
     plt.plot(cluster_sizes, fit_line, 'r-', label=f"fit: y = {m_fit:.3f}x")
     plt.legend()
+    plt.savefig(data_path + file_root + "sde_fit.png")
     plt.show()
 
     # read residues
@@ -121,6 +127,7 @@ def self_consistency(simulation_name, parameters, data_path):
 
     simul_time = 100
     dt = 0.01
+    sqrt_dt = sqrt(dt)
     num_steps = int(simul_time / dt)
 
     f = lambda x: a_fit * sqrt(x) + b_fit * x
@@ -132,7 +139,7 @@ def self_consistency(simulation_name, parameters, data_path):
 
         for cluster in clusters_pool:
             noise = random_from_residue(residues[cluster])
-            updated_cluster = f(cluster) * dt + g(cluster) * sqrt(dt) + noise
+            updated_cluster = f(cluster) * dt + g(cluster) * sqrt_dt + noise
 
             if updated_cluster < 1:
                 updated_cluster = choice(samples)
@@ -158,25 +165,31 @@ def self_consistency(simulation_name, parameters, data_path):
     cluster_icdf = cluster_icdf / cluster_icdf[0]
 
     # plot observed data
+    plt.title("Self consistency")
     plt.loglog(cluster_sizes, cluster_icdf, 'r.', label="observed")
     plt.legend()
+    plt.savefig(data_path + file_root + "sc.png")
     plt.show()
     
 
 if __name__ == '__main__':
     simulation_name = "tdp"
     dataset = "256x256_64"
-    # parameters = [0.7, 0]
-    # parameters = [0.65, 0]
-    # parameters = [0.51, 0.5]
-    parameters = [0.535, 0.5]
+    parameter_sets = [
+        [0.7, 0],
+        [0.65, 0],
+        [0.51, 0.5],
+        [0.535, 0.5]
+    ]
     samples_cutoff = 100000
 
     base_path = f"results/{simulation_name}/{dataset}/"
-    if simulation_name == "tdp":
-        p = str(parameters[0]).replace('.', 'p')
-        q = str(parameters[1]).replace('.', 'q')
-        simulation_folder = f"tdp_{p}_{q}"
-        base_path += f"{simulation_folder}/"
 
-    self_consistency(simulation_name, parameters, base_path)
+    for parameters in parameter_sets:
+        if simulation_name == "tdp":
+            p = str(parameters[0]).replace('.', 'p')
+            q = str(parameters[1]).replace('.', 'q')
+            simulation_folder = f"tdp_{p}_{q}"
+            base_path += f"{simulation_folder}/"
+
+        self_consistency(simulation_name, parameters, base_path)
