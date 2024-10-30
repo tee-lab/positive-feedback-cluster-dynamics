@@ -108,6 +108,7 @@ def self_consistency(simulation_name, parameters, data_path):
     # read residues
     data = open(data_path + file_root + "residues.txt", "r").read().split("\n")
     residues = {}
+    max_info = -1
 
     for line in data[:-1]:
         div1, div2, div3 = line.split(":")
@@ -118,6 +119,9 @@ def self_consistency(simulation_name, parameters, data_path):
         info["max_bin"] = max_bin
         info["dist"] = list(map(int, div3.split(",")))
         info["dist"] = info["dist"] / sum(info["dist"])
+
+        if int(div1) > max_info:
+            max_info = int(div1)
         
         residues[info["cluster_size"]] = info
 
@@ -138,7 +142,11 @@ def self_consistency(simulation_name, parameters, data_path):
         new_pool = []
 
         for cluster in clusters_pool:
-            noise = random_from_residue(residues[cluster])
+            if cluster in residues:
+                noise = random_from_residue(residues[cluster])
+            else:
+                noise = random_from_residue(residues[max_info])
+                
             updated_cluster = f(cluster) * dt + g(cluster) * sqrt_dt + noise
 
             if updated_cluster < 1:
