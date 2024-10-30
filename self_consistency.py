@@ -27,7 +27,7 @@ def random_from_residue(residue):
     return len(dist) + residue["min_bin"]
 
 
-def init_csd_from_random_null(size = 256, ensembles = 64):
+def init_csd_from_random_null(size = 256, ensembles = 1):
     cluster_sizes = []
 
     for _ in range(ensembles):
@@ -47,12 +47,12 @@ def init_csd_from_random_null(size = 256, ensembles = 64):
 
 
 def get_icdf(clusters):
-    biggest_cluster = max(clusters)
+    biggest_cluster = int(max(clusters))
     cluster_sizes = range(1, biggest_cluster + 1)
 
     frequencies = [0 for _ in range(biggest_cluster)]
     for cluster in clusters:
-        frequencies[cluster - 1] += 1
+        frequencies[int(cluster) - 1] += 1
 
     cluster_icdf = zeros(len(cluster_sizes), dtype=int)
 
@@ -105,6 +105,14 @@ def self_consistency(simulation_name, parameters, data_path):
     plt.savefig(data_path + file_root + "sde_fit.png")
     plt.show()
 
+    # load observed data
+    file_name = data_path + file_root + "csd.txt"
+    data = transpose(loadtxt(file_name, dtype=int))
+    cluster_sizes, frequencies = data[0], data[1]
+    observed_clusters = []
+    for cluster, frequency in zip(cluster_sizes, frequencies):
+        observed_clusters.extend([cluster for _ in range(frequency)])
+
     # read residues
     data = open(data_path + file_root + "residues.txt", "r").read().split("\n")
     residues = {}
@@ -126,12 +134,12 @@ def self_consistency(simulation_name, parameters, data_path):
         residues[info["cluster_size"]] = info
 
     # initialize SDE simulation
-    clusters_pool = init_csd_from_random_null()
+    clusters_pool = init_csd_from_random_null(size=256, ensembles=1)
     samples = clusters_pool.copy()
-
-    simul_time = 100
+    simul_time = 10
     dt = 0.01
     sqrt_dt = sqrt(dt)
+    num_underflow, num_overflow = 0, 0
     num_steps = int(simul_time / dt)
 
     f = lambda x: a_fit * sqrt(x) + b_fit * x
@@ -142,39 +150,32 @@ def self_consistency(simulation_name, parameters, data_path):
         new_pool = []
 
         for cluster in clusters_pool:
-            if cluster in residues:
-                noise = random_from_residue(residues[cluster])
+            if int(cluster) in residues:
+                noise = random_from_residue(residues[int(cluster)])
             else:
-                noise = random_from_residue(residues[max_info])
-                
-            updated_cluster = f(cluster) * dt + g(cluster) * sqrt_dt + noise
+                num_overflow += 1
+                cluster = choice(samples)
+
+            updated_cluster = cluster + f(cluster) * dt + g(cluster) * sqrt_dt * noise
 
             if updated_cluster < 1:
                 updated_cluster = choice(samples)
-            else:
-                updated_cluster = int(updated_cluster)
+                num_underflow += 1
 
             new_pool.append(updated_cluster)
 
         clusters_pool = new_pool
 
+    print(f"num_underflow: {num_underflow}, num_overflow: {num_overflow}, clusters * time steps: {len(clusters_pool) * num_steps}")
+
     # plot simulation data
     sim_sizes, sim_icdf = get_icdf(clusters_pool)
-    plt.loglog(sim_sizes, sim_icdf, 'b.', label="simulation")
+    obs_sizes, obs_icdf = get_icdf(observed_clusters)
 
-    # load observed data
-    file_name = data_path + file_root + "csd.txt"
-    data = transpose(loadtxt(file_name, dtype=int))
-    cluster_sizes, frequencies = data[0], data[1]
-    cluster_icdf = zeros(len(cluster_sizes), dtype=int)
-
-    for i in range(len(cluster_sizes)):
-        cluster_icdf[i] = frequencies[i:].sum()
-    cluster_icdf = cluster_icdf / cluster_icdf[0]
-
-    # plot observed data
+    plt.figure()
     plt.title("Self consistency")
-    plt.loglog(cluster_sizes, cluster_icdf, 'r.', label="observed")
+    plt.loglog(sim_sizes, sim_icdf, 'b.', label="simulation")
+    plt.loglog(obs_sizes, obs_icdf, 'r.', label="observed")
     plt.legend()
     plt.savefig(data_path + file_root + "sc.png")
     plt.show()
@@ -191,9 +192,9 @@ if __name__ == '__main__':
     ]
     samples_cutoff = 100000
 
-    base_path = f"results/{simulation_name}/{dataset}/"
-
     for parameters in parameter_sets:
+        base_path = f"results/{simulation_name}/{dataset}/"
+
         if simulation_name == "tdp":
             p = str(parameters[0]).replace('.', 'p')
             q = str(parameters[1]).replace('.', 'q')
