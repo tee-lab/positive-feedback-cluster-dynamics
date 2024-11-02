@@ -156,7 +156,11 @@ def self_consistency(simulation_name, parameters, data_path):
                 num_overflow += 1
                 cluster = choice(samples)
 
+            # ito sense
             updated_cluster = cluster + f(cluster) * dt + g(cluster) * sqrt_dt * noise
+
+            # difference equation
+            # updated_cluster = cluster + f(cluster) + g(cluster) * noise
 
             if updated_cluster < 1:
                 updated_cluster = choice(samples)
@@ -170,12 +174,14 @@ def self_consistency(simulation_name, parameters, data_path):
 
     # plot simulation data
     sim_sizes, sim_icdf = get_icdf(clusters_pool)
+    init_sizes, init_icdf = get_icdf(samples)
     obs_sizes, obs_icdf = get_icdf(observed_clusters)
 
     plt.figure()
     plt.title("Self consistency")
-    plt.loglog(sim_sizes, sim_icdf, 'b.', label="simulation")
-    plt.loglog(obs_sizes, obs_icdf, 'r.', label="observed")
+    plt.loglog(init_sizes, init_icdf, 'y.', label="simulation initial")
+    plt.loglog(sim_sizes, sim_icdf, 'b.', label="simulation end")
+    plt.loglog(obs_sizes, obs_icdf, 'r-', label="observed")
     plt.legend()
     plt.savefig(data_path + file_root + "sc.png")
     plt.show()
