@@ -1,3 +1,10 @@
+"""
+Version 1 of self consistency check
+Wherein clusters are initially sampled from a randomly generated model
+And synchronously and continuously evolved with dt = 0.01 according to fit drift and diffusion
+"""
+
+
 from matplotlib import pyplot as plt
 from numpy import loadtxt, sqrt, sum, transpose, zeros
 from random import choice, random
