@@ -6,8 +6,11 @@ from numpy import loadtxt, transpose
 from tqdm import tqdm
 from utils import get_file_root
 
+from fig_constants import *
 
-def load_diffusion(model_name, dataset, param, limit):
+
+def load_diffusion(model_name, dataset, param, samples_cutoff, limit):
+    base_path = f"./results"
     file_root = get_file_root(model_name, param)
     file_name = f"{base_path}/{model_name}/{dataset}/{file_root}/{file_root}_sde.txt"
     data = transpose(loadtxt(file_name, dtype=float))
@@ -27,10 +30,9 @@ def load_diffusion(model_name, dataset, param, limit):
         return cluster_sizes[:limit], diffusion[:limit]
 
 
-if __name__ == '__main__':
+def fig4(main_fig):
     base_path = f"./results"
     null_dataset = "256x256_64"
-    main_fig = False
 
     if null_dataset == "100x100_23":
         samples_cutoff = 5000
@@ -100,7 +102,7 @@ if __name__ == '__main__':
         variable = variables[row]
         density = densities[row]
 
-        subfig.suptitle(display_name, x=0.08, ha="left")
+        subfig.suptitle(display_name, x=0.08, ha="left", fontweight="bold")
         axs = subfig.subplots(nrows=1, ncols=num_cols)
 
         for col, ax in enumerate(axs):
@@ -121,8 +123,8 @@ if __name__ == '__main__':
                 else:
                     limit = 20000
 
-            cluster_sizes, diffusion = load_diffusion(model_name, dataset, param[col], limit)
-            null_cluster_sizes, null_diffusion = load_diffusion("null_model", null_dataset, [density[col]], limit)
+            cluster_sizes, diffusion = load_diffusion(model_name, dataset, param[col], samples_cutoff, limit)
+            null_cluster_sizes, null_diffusion = load_diffusion("null_model", null_dataset, [density[col]], samples_cutoff, limit)
 
             if row == 0 and col == 0:
                 ax.plot(cluster_sizes, diffusion, "b-", label="Model")
@@ -138,7 +140,7 @@ if __name__ == '__main__':
                 ax.set_xticks([])
                 
             if col == 0:
-                ax.set_ylabel("variance")
+                ax.set_ylabel("variance $g^2 (s)$")
 
             if row == 0 and col == num_cols - 1:
                 blue_line = Line2D([0], [0], color="blue", label="model")

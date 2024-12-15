@@ -6,8 +6,10 @@ from numpy import delete, loadtxt, transpose, zeros
 from utils import get_file_root
 from tqdm import tqdm
 
+from fig_constants import *
 
 def load_csd(model_name, dataset, param):
+    base_path = f"./results"
     file_root = get_file_root(model_name, param)
     file_name = f"{base_path}/{model_name}/{dataset}/{file_root}/{file_root}_csd.txt"
     data = transpose(loadtxt(file_name, dtype=int))
@@ -29,10 +31,9 @@ def load_csd(model_name, dataset, param):
     return cluster_sizes, cluster_icdf
 
 
-if __name__ == '__main__':
+def fig1(main_fig):
     base_path = f"./results"
     null_dataset = "256x256_64"
-    main_fig = False
 
     model_names = []
     display_names = []
@@ -86,7 +87,8 @@ if __name__ == '__main__':
     num_rows = len(model_names)
     num_cols = 4
     fig, axs = plt.subplots(nrows=num_rows, ncols=1, constrained_layout=True, figsize=(8.27, 8.27 * num_rows / num_cols + 2))
-    fig.suptitle('Cluster Size Distribution')
+    fig.suptitle('Cluster Size Distribution', fontsize=main_title_size)
+    plt.rc("axes", labelsize=label_size)
 
     for ax in axs:
         ax.remove()
@@ -103,7 +105,7 @@ if __name__ == '__main__':
         density = densities[row]
         phase_diagram_file = phase_diagram_files[row]
 
-        subfig.suptitle(display_name, x=0.065, ha="left")
+        subfig.suptitle(display_name, x=0.065, ha="left", fontweight="bold", fontsize=row_title_size)
         axs = subfig.subplots(nrows=1, ncols=num_cols)
         for col, ax in enumerate(axs):
             if col == 0:

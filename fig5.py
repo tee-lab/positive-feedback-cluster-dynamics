@@ -6,8 +6,11 @@ from numpy import array
 from tqdm import tqdm
 from utils import get_file_root
 
+from fig_constants import *
 
-def load_residues(model_name, dataset, param, cluster_size_req):
+
+def load_residues(model_name, dataset, param, cluster_size_req, positive_only):
+    base_path = f"./results"
     file_root = get_file_root(model_name, param)
     file_name = f"{base_path}/{model_name}/{dataset}/{file_root}/{file_root}_residues.txt"
     fp = open(file_name, "r")
@@ -22,25 +25,28 @@ def load_residues(model_name, dataset, param, cluster_size_req):
             freqs = array(list(map(int, section3.split(", "))))
             bin_range = list(range(bins[0], bins[1]))
 
-            zero_index = -1
-            for i in range(len(bin_range)):
-                if bin_range[i] == 0:
-                    zero_index = i
-                    break
+            if positive_only:
+                # find where zero is
+                zero_index = -1
+                for i in range(len(bin_range)):
+                    if bin_range[i] == 0:
+                        zero_index = i
+                        break
 
-            bin_range = bin_range[zero_index:]
-            freqs = freqs[zero_index:] / sum(freqs[zero_index:])
-
-            return bin_range, freqs
+                # look at the distribution of positive residues only
+                bin_range = bin_range[zero_index:]
+                freqs = freqs[zero_index:] / sum(freqs[zero_index:])
+                return bin_range, freqs
+            else:
+                return bin_range, freqs
         
     return None
 
 
-if __name__ == '__main__':
+def fig5(main_fig):
     base_path = f"./results"
     null_dataset = "256x256_64"
     cluster_size = 100
-    main_fig = False
 
     model_names = []
     display_names = []
@@ -88,7 +94,8 @@ if __name__ == '__main__':
     num_rows = len(model_names)
     num_cols = 3
     fig, axs = plt.subplots(nrows=num_rows, ncols=1, constrained_layout=True, figsize=(8.27, 8.27 * num_rows / num_cols + 2))
-    fig.suptitle(f'Distribution of residues for cluster size {cluster_size}')
+    fig.suptitle(f'Distribution of residues for cluster size {cluster_size}', fontsize=main_title_size)
+    plt.rc("axes", labelsize=label_size)
 
     # clear subplots
     for ax in axs:
@@ -105,14 +112,15 @@ if __name__ == '__main__':
         variable = variables[row]
         density = densities[row]
 
-        subfig.suptitle(display_name, x=0.08, ha="left")
+        subfig.suptitle(display_name, x=0.08, ha="left", fontweight="bold", fontsize=row_title_size)
         axs = subfig.subplots(nrows=1, ncols=num_cols)
 
         for col, ax in enumerate(axs):
             ax.set_title(chr(65 + row) + str(col + 1), loc="left")
 
-            residues, freqs = load_residues(model_name, dataset, param[col], cluster_size)
-            null_result = load_residues("null_model", null_dataset, [density[col]], cluster_size)
+            # plot the main graph
+            residues, freqs = load_residues(model_name, dataset, param[col], cluster_size, True)
+            null_result = load_residues("null_model", null_dataset, [density[col]], cluster_size, True)
 
             if row == 0 and col == 0:
                 ax.loglog(residues, freqs, "bo", label="Model")
@@ -124,6 +132,11 @@ if __name__ == '__main__':
                 if null_result is not None:
                     null_residues, null_freqs = null_result
                     ax.loglog(null_residues, null_freqs, "ko")
+
+            # plot the inset
+            residues, freqs = load_residues(model_name, dataset, param[col], cluster_size, False)
+            ax_inset = ax.inset_axes([0.15, 0.1, 0.4, 0.4])
+            ax_inset.semilogy(residues, freqs)
 
             if row == num_rows - 1:
                 ax.set_xlabel("residues")

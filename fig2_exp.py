@@ -6,8 +6,11 @@ from numpy import array, delete, loadtxt, transpose, zeros
 from utils import get_file_root
 from tqdm import tqdm
 
+from fig_constants import *
+
 
 def load_cd(model_name, dataset, param):
+    base_path = f"./results"
     file_root = get_file_root(model_name, param)
     file_name = f"{base_path}/{model_name}/{dataset}/{file_root}/{file_root}_cd.txt"
     data = transpose(loadtxt(file_name, dtype=int))
@@ -53,10 +56,9 @@ def load_cd(model_name, dataset, param):
     return abs_changes, changes_icdf
 
 
-if __name__ == '__main__':
+def fig2_exp(main_fig):
     base_path = f"./results"
     null_dataset = "256x256_64"
-    main_fig = False
 
     model_names = []
     display_names = []
@@ -104,7 +106,8 @@ if __name__ == '__main__':
     num_rows = len(model_names)
     num_cols = 3
     fig, axs = plt.subplots(nrows=num_rows, ncols=1, constrained_layout=True, figsize=(8.27, 8.27 * num_rows / num_cols + 2))
-    fig.suptitle('Cluster Dynamics: Distribution of Changes in Cluster Sizes')
+    fig.suptitle('Cluster Dynamics: Distribution of Changes in Cluster Sizes', fontsize=main_title_size)
+    plt.rc("axes", labelsize=label_size)
 
     # clear subplots
     for ax in axs:
@@ -115,13 +118,13 @@ if __name__ == '__main__':
 
     for row, subfig in enumerate(tqdm(subfigs)):
         model_name = model_names[row]
-        display_name = display_names[row]
+        display_name = f"({chr(65 + row)}) {display_names[row]}"
         dataset = datasets[row]
         param = params[row]
         variable = variables[row]
         density = densities[row]
 
-        subfig.suptitle(display_name, x=0.08, ha="left")
+        subfig.suptitle(display_name, x=0.08, ha="left", fontweight="bold", fontsize=row_title_size)
         axs = subfig.subplots(nrows=1, ncols=num_cols)
 
         for col, ax in enumerate(axs):

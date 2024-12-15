@@ -1,4 +1,4 @@
-# ABRUPT PROCESSES
+# NUMBER OF PROCESSES
 
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
@@ -6,8 +6,11 @@ from numpy import loadtxt, transpose
 from tqdm import tqdm
 from utils import get_file_root
 
+from fig_constants import *
 
-def load_processes(model_name, dataset, param):
+
+def load_processes(model_name, dataset, param, samples_cutoff):
+    base_path = f"./results"
     file_root = get_file_root(model_name, param)
     file_name = f"{base_path}/{model_name}/{dataset}/{file_root}/{file_root}_sde.txt"
     data = transpose(loadtxt(file_name, dtype=float))
@@ -28,10 +31,9 @@ def load_processes(model_name, dataset, param):
     return cluster_sizes[:limit], growth[:limit], decay[:limit], merge[:limit], split[:limit]
 
 
-if __name__ == '__main__':
+def fig7(main_fig):
     base_path = f"./results"
     null_dataset = "256x256_64"
-    main_fig = False
 
     if null_dataset == "100x100_23":
         samples_cutoff = 5000
@@ -90,7 +92,8 @@ if __name__ == '__main__':
     num_rows = len(model_names)
     num_cols = 3
     fig, axs = plt.subplots(nrows=num_rows, ncols=1, constrained_layout=True, figsize=(8.27, 8.27 * num_rows / num_cols + 2))
-    fig.suptitle('Number of Processes')
+    fig.suptitle('Number of Processes', fontsize=main_title_size)
+    plt.rc("axes", labelsize=label_size)
 
     # clear subplots
     for ax in axs:
@@ -106,13 +109,13 @@ if __name__ == '__main__':
         param = params[row]
         variable = variables[row]
 
-        subfig.suptitle(display_name, x=0.08, ha="left")
+        subfig.suptitle(display_name, x=0.08, ha="left", fontweight="bold", fontsize=row_title_size)
         axs = subfig.subplots(nrows=1, ncols=num_cols)
 
         for col, ax in enumerate(axs):
             ax.set_title(chr(65 + row) + str(col + 1), loc="left")
 
-            cluster_sizes, growth, decay, merge, split = load_processes(model_name, dataset, param[col])
+            cluster_sizes, growth, decay, merge, split = load_processes(model_name, dataset, param[col], samples_cutoff)
             # null_cluster_sizes, null_merge, null_split = load_drift("null_model", null_dataset, [density[col]], 100)
 
             ax.loglog(cluster_sizes, merge, "b-")
