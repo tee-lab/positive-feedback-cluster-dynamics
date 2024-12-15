@@ -9,12 +9,17 @@ from fig7 import fig7
 
 
 if __name__ == '__main__':
-    main_fig = True
-    fig1(main_fig)
-    fig2_exp(main_fig)
-    fig2(main_fig)
-    fig3(main_fig)
-    fig4(main_fig)
-    fig5(main_fig)
-    fig6(main_fig)
-    fig7(main_fig)
+    main_fig = False
+    model_dataset = "256x256_64"
+    scanlon = "8_24"
+    null_dataset = "256x256_64"
+    
+    fig1(model_dataset, scanlon, null_dataset, main_fig)
+    fig2_exp(model_dataset, scanlon, null_dataset, main_fig)
+    fig2(model_dataset, scanlon, null_dataset, main_fig)
+    fig3(model_dataset, scanlon, null_dataset, main_fig)
+    fig4(model_dataset, scanlon, null_dataset, main_fig)
+    fig5(model_dataset, scanlon, null_dataset, main_fig, 50)
+    fig5(model_dataset, scanlon, null_dataset, main_fig, 100)
+    fig6(model_dataset, scanlon, null_dataset, main_fig)
+    fig7(model_dataset, scanlon, null_dataset, main_fig)
