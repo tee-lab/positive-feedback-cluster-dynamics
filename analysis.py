@@ -85,6 +85,7 @@ def cluster_sde(clusters_before, clusters_after, file_root):
         else:
             cluster_changes[affected_cluster] = [change]
 
+    dt = 1.0 / (256 * 256)
     cluster_sizes = []
     drifts, diffusions = [], []
     num_samples, residues = [], []
@@ -94,8 +95,8 @@ def cluster_sde(clusters_before, clusters_after, file_root):
 
     for cluster_size in tqdm(sorted(cluster_changes.keys())):
         changes = array(cluster_changes[cluster_size])
-        drift = changes.mean()
-        diffusion = ((changes - drift) ** 2).mean()
+        drift = changes.mean() / dt
+        diffusion = ((changes - drift) ** 2).mean() / dt
 
         cluster_sizes.append(cluster_size)
         drifts.append(drift)
@@ -117,8 +118,8 @@ def cluster_sde(clusters_before, clusters_after, file_root):
         else:
             avg_split_change.append(0)
 
-        # if len(changes) > 100:
-        if len(changes) > 100 and cluster_size in [10, 30, 50, 100, 200, 500]:
+        if len(changes) > 100:
+        # if len(changes) > 100 and cluster_size in [10, 30, 50, 100, 200, 500]:
             residue_list = [int(change - drift) for change in changes]
             min_bin = min(residue_list) - 1
             max_bin = max(residue_list) + 1
