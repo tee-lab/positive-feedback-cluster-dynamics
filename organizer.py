@@ -37,19 +37,19 @@ def organize(simulation_name, parameter_values):
 if __name__ == '__main__':
     output_path = "outputs/"
 
-    simulation_name = "tdp"
-    parameter_values = [
-        [0.65, 0],
-        [0.7, 0],
-        [0.72, 0],
-    ]
-
     # simulation_name = "tdp"
     # parameter_values = [
-    #     [0.51, 0.5],
-    #     [0.535, 0.5],
-    #     [0.55, 0.5]
+    #     [0.65, 0],
+    #     [0.7, 0],
+    #     [0.72, 0],
     # ]
+
+    simulation_name = "tdp"
+    parameter_values = [
+        [0.51, 0.5],
+        [0.535, 0.5],
+        [0.55, 0.5]
+    ]
 
     # simulation_name = "tdp"
     # parameter_values = [

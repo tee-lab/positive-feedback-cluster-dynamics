@@ -120,7 +120,7 @@ def cluster_sde(clusters_before, clusters_after, file_root):
 
         if len(changes) > 100:
         # if len(changes) > 100 and cluster_size in [10, 30, 50, 100, 200, 500]:
-            residue_list = [int(change - drift) for change in changes]
+            residue_list = [int(change - drift * dt) for change in changes]
             min_bin = min(residue_list) - 1
             max_bin = max(residue_list) + 1
 
