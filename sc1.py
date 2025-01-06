@@ -143,8 +143,8 @@ def self_consistency(simulation_name, parameters, data_path):
     # initialize SDE simulation
     clusters_pool = init_csd_from_random_null(size=256, ensembles=1)
     samples = clusters_pool.copy()
-    simul_time = 10
-    dt = 0.01
+    simul_time = 1000
+    dt = 1.0 / (256 * 256)
     sqrt_dt = sqrt(dt)
     num_underflow, num_overflow = 0, 0
     num_steps = int(simul_time / dt)
@@ -196,7 +196,7 @@ def self_consistency(simulation_name, parameters, data_path):
 
 if __name__ == '__main__':
     simulation_name = "tdp"
-    dataset = "256x256_64"
+    dataset = "256x256_64_v2"
     parameter_sets = [
         [0.7, 0],
         [0.65, 0],
